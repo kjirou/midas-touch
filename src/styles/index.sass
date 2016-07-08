@@ -1,0 +1,140 @@
+@import 'sanitize.sass'
+
+
+//
+// Variables
+//
+// Should sync to consts.STYLES
+//
+$app-background-color: #000000
+$app-color: #ffffff
+$app-height: 600px
+$app-width: 360px
+$app-width-scroll-bar: 20px
+$icon-height: 32px
+$icon-width: 32px
+$z-index-default: 1
+
+
+//
+// Development Mode
+//
+body.is-development
+  height: 100%
+  background-color: #cccccc
+
+  .js-pc-container
+    margin: 10px auto
+
+
+//
+// Fonts
+//
+@font-face
+  font-family: 'Morris Roman'
+  src: url('materials/fonts/morris-roman/MorrisRoman-Black.ttf') format('truetype')
+
+
+//
+// Reset
+//
+.js-pc-container
+  ul, ol
+    list-style-type: none
+
+
+//
+// Root, NavigationBar
+//
+.js-pc-container
+
+  .root
+    margin: 0 auto
+    position: relative
+    width: $app-width
+    height: $app-height
+    background-color: $app-background-color
+
+    .root__page-container
+      position: absolute
+      width: 100%
+      height: 100%
+      overflow: hidden
+
+
+//
+// Pages
+//
+.js-pc-container
+
+  @mixin page-base()
+    position: absolute
+    width: $app-width
+    height: $app-height
+    font-size: 12px
+    color: $app-color
+    background-color: $app-background-color
+
+  .game-page
+    $margin-side: 8px
+    $content-width: $app-width - $margin-side * 2
+    @include page-base()
+
+    &__header
+      height: 48px
+
+    &__field
+      height: 180px
+
+    &__messages
+      height: 48px
+
+    &__controller
+      display: flex
+      justify-content: space-between
+      height: 64px
+      padding: 8px 12px
+
+      @mixin button-base()
+        height: 48px
+        background-color: $app-background-color
+        border: 2px solid $app-color
+        border-radius: 4px
+        cursor: pointer
+
+      .status-button
+        @include button-base()
+        width: 20%
+
+      .next-button
+        @include button-base()
+        width: 50%
+
+      .system-button
+        @include button-base()
+        width: 20%
+
+    &__parts-and-skills
+      width: $app-width + $app-width-scroll-bar
+      height: $app-height - 48 - 180 - 48 - 64
+      overflow: scroll
+      overflow-x: hidden
+
+      li
+        display: block
+        width: $app-width
+        cursor: pointer
+
+        &.category-partition
+          height: 16px
+          padding-left: 2px
+          font-size: 14px
+          line-height: 16px
+          font-family: 'Morris Roman'
+          letter-spacing: 3px
+          color: $app-background-color
+          background-color: $app-color
+
+        &.bar
+          height: 50px
+          border-bottom: 2px solid $app-color
