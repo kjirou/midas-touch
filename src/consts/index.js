@@ -6,16 +6,12 @@ export const EVENTS = {
 };
 
 export const PARAMETERS = {
-  MAX_MAX_HP: 99,
-  MIN_MAX_HP: 1,
 };
 
 export const PAGE_IDS = {
-  GAME: 'GAME',
+  CANVAS: 'CANVAS',
 };
 
 // Should sync to stylesheets
 export const STYLES = {
-  ICON_HEIGHT: 32,
-  ICON_WIDTH: 32,
 };

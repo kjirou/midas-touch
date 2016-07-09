@@ -6,8 +6,7 @@ import pages from './pages';
 export default class Root extends React.Component {
 
   _getCurrentPage() {
-    return pages['GAME'];
-    //return pages[this.props.pageId];
+    return pages['CANVAS'];
   }
 
   render() {
@@ -22,7 +21,7 @@ export default class Root extends React.Component {
     return (
       <div className="root">
         <div className="root__page-container">
-          Hello!
+          { page }
         </div>
       </div>
     );

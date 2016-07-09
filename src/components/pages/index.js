@@ -1,9 +1,9 @@
 import { PAGE_IDS } from '../../consts';
-import GamePage from './GamePage';
+import CanvasPage from './CanvasPage';
 
 
 const pages = {
-  [PAGE_IDS.GAME]: GamePage,
+  [PAGE_IDS.CANVAS]: CanvasPage,
 };
 
 
