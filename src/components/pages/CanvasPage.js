@@ -5,9 +5,11 @@ import Page from './Page';
 
 
 // TODO
+// - [Question] Why is the `fillRect(10, 10, 50, 100)` larger than 50px x 100px?
 // - Show a controller
 // - Save to own device as the data-uri format
 // - Undo/Redo
+// - [Help] Disable scrolling
 
 export default class CanvasPage extends Page {
 
