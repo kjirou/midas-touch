@@ -18,8 +18,13 @@ export default class Root extends React.Component {
       //scene: this.props.scene,
     });
 
+    const styles = {
+      width: this.props.screenSize.width,
+      height: this.props.screenSize.height,
+    };
+
     return (
-      <div className="root">
+      <div className="root" style={ styles }>
         <div className="root__page-container">
           { page }
         </div>
@@ -27,3 +32,9 @@ export default class Root extends React.Component {
     );
   }
 }
+
+Object.assign(Root, {
+  propTypes: {
+    screenSize: React.PropTypes.object.isRequired,
+  },
+});

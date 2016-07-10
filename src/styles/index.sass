@@ -8,8 +8,8 @@
 //
 $app-background-color: #ffffff
 $app-color: #000000
-$app-height: 100%
-$app-width: 100%
+//$app-height: 100%
+//$app-width: 100%
 $app-width-scroll-bar: 20px
 $icon-height: 32px
 $icon-width: 32px
@@ -20,11 +20,7 @@ $z-index-default: 1
 // Development Mode
 //
 body.is-development
-  height: 100%
   background-color: #cccccc
-
-  .js-mt-container
-    margin: 10px auto
 
 
 //
@@ -51,8 +47,9 @@ body.is-development
   .root
     margin: 0 auto
     position: relative
-    width: $app-width
-    height: $app-height
+    // Set the screen size according from the browser's viewport dynamically
+    //width: $app-width
+    //height: $app-height
     background-color: $app-background-color
 
     .root__page-container
@@ -69,15 +66,11 @@ body.is-development
 
   @mixin page-base()
     position: absolute
-    width: $app-width
-    height: $app-height
+    width: 100%
+    height: 100%
     font-size: 15px
     color: $app-color
     background-color: $app-background-color
 
   .canvas-page
     @include page-base()
-
-    &__canvas
-      width: 100%;
-      height: 100%;

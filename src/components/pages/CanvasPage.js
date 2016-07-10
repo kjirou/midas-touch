@@ -7,16 +7,21 @@ import Page from './Page';
 export default class CanvasPage extends Page {
 
   _findCanvasNode() {
+    return ReactDOM.findDOMNode(this).querySelector('.js-canvas-page__canvas');
   }
 
   componentDidMount() {
-    console.log(1111);
+    const canvas = this._findCanvasNode();
+
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'green';
+    ctx.fillRect(10, 10, 100, 100);
   }
 
   render() {
     return (
       <div className="canvas-page">
-        <div className="canvas-page__canvas .js-canvas-page__canvas" />
+        <canvas className="js-canvas-page__canvas" />
       </div>
     );
   }
