@@ -3,16 +3,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Root from './components/Root';
+import { PAGE_IDS } from './consts';
 
 
 window.document.addEventListener('DOMContentLoaded', () => {
   const viewportSize = getViewportSize();
 
-  const container = window.document.querySelector('.js-mt-container');
-  ReactDOM.render(React.createElement(Root, {
+  const root = React.createElement(Root, {
+    pageId: PAGE_IDS.CANVAS,
     screenSize: {
       width: viewportSize.width,
       height: viewportSize.height,
     },
-  }), container);
+  });
+  const container = window.document.querySelector('.js-mt-container');
+  ReactDOM.render(root, container);
 });

@@ -5,17 +5,15 @@ import pages from './pages';
 
 export default class Root extends React.Component {
 
-  _getCurrentPage() {
-    return pages['CANVAS'];
+  _getCurrentPageComponent() {
+    return pages[this.props.pageId];
   }
 
   render() {
-    const Page = this._getCurrentPage();
-    const page = React.createElement(Page, {
-      key: 'GAME',
-      //key: this.props.pageId,
+    const page = React.createElement(this._getCurrentPageComponent(), {
+      key: `page-${ this.props.pageId }`,
       root: this.props,
-      //scene: this.props.scene,
+      page: {},
     });
 
     const styles = {

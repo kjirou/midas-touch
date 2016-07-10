@@ -8,8 +8,7 @@ Object.assign(Page, {
   //defaultProps: {
   //  scene: null,
   //},
-  //propTypes: {
-  //  root: React.PropTypes.object.isRequired,
-  //  scene: React.PropTypes.object,
-  //},
+  propTypes: {
+    root: React.PropTypes.object.isRequired,
+  },
 });
