@@ -5,11 +5,17 @@ import Page from './Page';
 
 
 // TODO
+// - Draw lines
 // - Show a controller
 // - Save to own device as the data-uri format
 // - Undo/Redo
 
 export default class CanvasPage extends Page {
+
+  constructor() {
+    super();
+    this._canvasContext = null;
+  }
 
   _findCanvasNode() {
     return ReactDOM.findDOMNode(this).querySelector('.js-canvas-page__canvas');
@@ -36,25 +42,25 @@ export default class CanvasPage extends Page {
   }
 
   _handleCanvasTouchStart(evnet) {
-    console.log('touchstart', event);
   }
 
   _handleCanvasTouchMove(event) {
     event.stopPropagation();
     event.preventDefault();
-    console.log('touchmove', event);
+
+    const touch = event.changedTouches.item(0);
+    const touchX = Math.round(touch.clientX);
+    const touchY = Math.round(touch.clientY);
+
+    this._canvasContext.fillRect(touchX - 5, touchY - 5, 10, 10);
   }
 
   _handleCanvasTouchEnd(event) {
-    console.log('touchend', event);
   }
 
   componentDidMount() {
     const canvas = this._findCanvasNode();
-
-    const ctx = canvas.getContext('2d');
-    //ctx.fillStyle = 'green';
-    ctx.fillRect(10, 20, 50, 100);
+    this._canvasContext = canvas.getContext('2d');
   }
 
   render() {
