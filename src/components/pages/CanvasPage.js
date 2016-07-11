@@ -8,7 +8,6 @@ import Page from './Page';
 // - Show a controller
 // - Save to own device as the data-uri format
 // - Undo/Redo
-// - [Help] Disable scrolling
 
 export default class CanvasPage extends Page {
 
@@ -41,6 +40,8 @@ export default class CanvasPage extends Page {
   }
 
   _handleCanvasTouchMove(event) {
+    event.stopPropagation();
+    event.preventDefault();
     console.log('touchmove', event);
   }
 
