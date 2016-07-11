@@ -5,7 +5,6 @@ import Page from './Page';
 
 
 // TODO
-// - [Question] Why is the `fillRect(10, 10, 50, 100)` larger than 50px x 100px?
 // - Show a controller
 // - Save to own device as the data-uri format
 // - Undo/Redo
@@ -66,10 +65,8 @@ export default class CanvasPage extends Page {
       >
         <canvas
           className="js-canvas-page__canvas"
-          style={ {
-            width: this.props.root.screenSize.width,
-            height: this.props.root.screenSize.height,
-          } }
+          width={ this.props.root.screenSize.width }
+          height={ this.props.root.screenSize.height }
           onClick={ this._handleCanvasClick.bind(this) }
           onMouseDown={ this._handleCanvasMouseDown.bind(this) }
           onTouchStart={ this._handleCanvasTouchStart.bind(this) }
