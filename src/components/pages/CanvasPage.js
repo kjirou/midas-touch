@@ -5,7 +5,7 @@ import Page from './Page';
 
 
 // TODO
-// - Draw lines
+// - Adjust to the center of lineWidth
 // - Show a controller
 // - Save to own device as the data-uri format
 // - Undo/Redo
@@ -15,6 +15,11 @@ export default class CanvasPage extends Page {
   constructor() {
     super();
     this._canvasContext = null;
+
+    /*
+     * {(number[]|null)} - [x, y]
+     */
+    this._beforeMatrix = null;
   }
 
   _findCanvasNode() {
@@ -42,6 +47,7 @@ export default class CanvasPage extends Page {
   }
 
   _handleCanvasTouchStart(evnet) {
+    this._beforeMatrix = null;
   }
 
   _handleCanvasTouchMove(event) {
@@ -49,10 +55,23 @@ export default class CanvasPage extends Page {
     event.preventDefault();
 
     const touch = event.changedTouches.item(0);
-    const touchX = Math.round(touch.clientX);
-    const touchY = Math.round(touch.clientY);
 
-    this._canvasContext.fillRect(touchX - 5, touchY - 5, 10, 10);
+    const beforeMatrix = this._beforeMatrix;
+    const currentMatrix = [
+      Math.round(touch.clientX),
+      Math.round(touch.clientY),
+    ];
+
+    if (beforeMatrix !== null) {
+      this._canvasContext.lineWidth = 1;
+      this._canvasContext.beginPath();
+      this._canvasContext.moveTo(beforeMatrix[0], beforeMatrix[1]);
+      this._canvasContext.lineTo(currentMatrix[0], currentMatrix[1]);
+      this._canvasContext.closePath();
+      this._canvasContext.stroke();
+    }
+
+    this._beforeMatrix = currentMatrix;
   }
 
   _handleCanvasTouchEnd(event) {
