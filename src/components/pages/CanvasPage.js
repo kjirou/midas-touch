@@ -34,9 +34,16 @@ export default class CanvasPage extends Page {
     return ReactDOM.findDOMNode(this).querySelector('.js-canvas-page__canvas');
   }
 
-  _clearCanvas() {
+  _clear() {
     this._canvasContext.clearRect(0, 0,
       this.props.root.screenSize.width, this.props.root.screenSize.height);
+  }
+
+  _drawImageFromDataUri(dataUri) {
+    const { width, height } = this.props.root.screenSize;
+    const image = new Image(width, height);
+    image.src = dataUri;
+    this._canvasContext.drawImage(image, 0, 0, width, height);
   }
 
   _undo() {
@@ -44,11 +51,8 @@ export default class CanvasPage extends Page {
     const dataUri = this._editHistory[previousEditHistoryCursor];
 
     if (dataUri) {
-      this._clearCanvas();
-      const image = new Image(this.props.root.screenSize.width, this.props.root.screenSize.height);
-      image.src = dataUri;
-      this._canvasContext.drawImage(image, 0, 0,
-        this.props.root.screenSize.width, this.props.root.screenSize.height);
+      this._clear();
+      this._drawImageFromDataUri(dataUri);
     }
 
     if (previousEditHistoryCursor >= -1) {
@@ -61,12 +65,8 @@ export default class CanvasPage extends Page {
 
     const dataUri = this._editHistory[nextEditHistoryCursor];
     if (dataUri) {
-      this._clearCanvas();
-      const image = new Image(this.props.root.screenSize.width, this.props.root.screenSize.height);
-      image.src = dataUri;
-      this._canvasContext.drawImage(image, 0, 0,
-        this.props.root.screenSize.width, this.props.root.screenSize.height);
-
+      this._clear();
+      this._drawImageFromDataUri(dataUri);
       this._editHistoryCursor = nextEditHistoryCursor;
     }
   }
@@ -137,7 +137,7 @@ export default class CanvasPage extends Page {
     window.addEventListener('keydown', (event) => {
       switch (event.keyCode) {
         case 67:  // "c"
-          this._clearCanvas();
+          this._clear();
           break;
         case 68:  // "d"
           console.log(this);
