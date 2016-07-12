@@ -5,25 +5,55 @@ import Page from './Page';
 
 
 // TODO
+// - Show a controller
 // - Adjust to the center of lineWidth
 // - Show a controller
 // - Save to own device as the data-uri format
-// - Undo/Redo
+// - Redo
 
 export default class CanvasPage extends Page {
 
   constructor() {
     super();
+
     this._canvasContext = null;
 
     /*
      * {(number[]|null)} - [x, y]
      */
     this._beforeMatrix = null;
+
+    /*
+     * {string[]} - [dataUri0, dataUri1, ..]
+     */
+    this._editHistory = [];
+
+    this._editHistoryCursor = -1;
   }
 
   _findCanvasNode() {
     return ReactDOM.findDOMNode(this).querySelector('.js-canvas-page__canvas');
+  }
+
+  _undo() {
+    this._canvasContext.clearRect(0, 0, this.props.root.screenSize.width, this.props.root.screenSize.height);
+
+    const beforeEditHistoryCursor = this._editHistoryCursor - 1;
+    const dataUri = this._editHistory[beforeEditHistoryCursor];
+
+    if (dataUri) {
+      const image = new Image(this.props.root.screenSize.width, this.props.root.screenSize.height);
+      image.src = dataUri;
+      this._canvasContext.drawImage(image, 0, 0,
+        this.props.root.screenSize.width, this.props.root.screenSize.height);
+    }
+
+    if (beforeEditHistoryCursor >= -1) {
+      this._editHistoryCursor = beforeEditHistoryCursor;
+    }
+  }
+
+  _redo() {
   }
 
   _handleScroll(event) {
@@ -75,6 +105,12 @@ export default class CanvasPage extends Page {
   }
 
   _handleCanvasTouchEnd(event) {
+    const canvas = this._findCanvasNode();
+
+    // Add a history
+    this._editHistory.push(canvas.toDataURL());
+    this._editHistory = this._editHistory.slice(-20);
+    this._editHistoryCursor = this._editHistory.length - 1;
   }
 
   componentDidMount() {
@@ -87,6 +123,12 @@ export default class CanvasPage extends Page {
         case 67:  // "c"
           this._canvasContext.clearRect(0, 0,
             this.props.root.screenSize.width, this.props.root.screenSize.height);
+          break;
+        case 68:  // "d"
+          console.log(this);
+          break;
+        case 85:  // "u"
+          this._undo();
           break;
       }
     });
