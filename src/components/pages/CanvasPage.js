@@ -80,6 +80,16 @@ export default class CanvasPage extends Page {
   componentDidMount() {
     const canvas = this._findCanvasNode();
     this._canvasContext = canvas.getContext('2d');
+
+    // For debug
+    window.addEventListener('keydown', (event) => {
+      switch (event.keyCode) {
+        case 67:  // "c"
+          this._canvasContext.clearRect(0, 0,
+            this.props.root.screenSize.width, this.props.root.screenSize.height);
+          break;
+      }
+    });
   }
 
   render() {
