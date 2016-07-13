@@ -5,7 +5,6 @@ import Page from './Page';
 
 
 // TODO
-// - Show a controller
 // - Adjust to the center of lineWidth
 // - Show a controller
 // - Save to own device as the data-uri format
@@ -28,6 +27,11 @@ export default class CanvasPage extends Page {
     this._editHistory = [];
 
     this._editHistoryCursor = -1;
+
+    /*
+     * {object[]} - [{ timestamp }, { timestamp }, ..]
+     */
+    this._touchStarts = [];
   }
 
   _findCanvasNode() {
@@ -127,11 +131,34 @@ export default class CanvasPage extends Page {
     this._editHistory.push(canvas.toDataURL());
     this._editHistory = this._editHistory.slice(-20);
     this._editHistoryCursor = this._editHistory.length - 1;
+
+    this._touchStarts = [];
   }
 
   componentDidMount() {
     const canvas = this._findCanvasNode();
     this._canvasContext = canvas.getContext('2d');
+
+    // Original multiple touch points event handler
+    //   It uses the native "touchstart",
+    //   because the React Component's `onTouchStart` does not have `event.changedTouches` now
+    canvas.addEventListener('touchstart', (event) => {
+      const nowTimestamp = new Date().getTime();
+
+      this._touchStarts = this._touchStarts.filter(touchStart => touchStart.timestamp > nowTimestamp - 10);
+
+      for (let i = 0; i < event.changedTouches.length; i += 1) {
+        const touch = event.changedTouches.item(i);
+        this._touchStarts.push({
+          timestamp: nowTimestamp,
+        });
+      }
+
+      if (this._touchStarts.length >= 2) {
+        alert('Touch 2 or more points at the same time!');
+        this._touchStarts = [];
+      }
+    });
 
     // For debug
     window.addEventListener('keydown', (event) => {
