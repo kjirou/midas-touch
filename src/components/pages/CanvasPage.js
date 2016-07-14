@@ -1,13 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import ControlPanel from '../ControlPanel';
 import Page from './Page';
 
 
 // TODO
 // - Adjust to the center of lineWidth
-// - Show a controller
+// - Switch the Controll Panel position by the touched point
 // - Save to own device as the data-uri format
+
+
+const MULTI_TOUCH_RECEIVABLE_INTERVAL = 50;
+
 
 export default class CanvasPage extends Page {
 
@@ -32,6 +37,10 @@ export default class CanvasPage extends Page {
      * {object[]} - [{ timestamp }, { timestamp }, ..]
      */
     this._touchStarts = [];
+
+    this.state = {
+      isControlPanelOpened: false
+    };
   }
 
   _findCanvasNode() {
@@ -48,6 +57,14 @@ export default class CanvasPage extends Page {
     const image = new Image(width, height);
     image.src = dataUri;
     this._canvasContext.drawImage(image, 0, 0, width, height);
+  }
+
+  _openControlPanel() {
+    this.setState({ isControlPanelOpened: true });
+  }
+
+  _closeControlPanel() {
+    this.setState({ isControlPanelOpened: false });
   }
 
   _undo() {
@@ -145,7 +162,9 @@ export default class CanvasPage extends Page {
     canvas.addEventListener('touchstart', (event) => {
       const nowTimestamp = new Date().getTime();
 
-      this._touchStarts = this._touchStarts.filter(touchStart => touchStart.timestamp > nowTimestamp - 10);
+      this._touchStarts = this._touchStarts.filter(touchStart => {
+        return touchStart.timestamp > nowTimestamp - MULTI_TOUCH_RECEIVABLE_INTERVAL;
+      });
 
       for (let i = 0; i < event.changedTouches.length; i += 1) {
         const touch = event.changedTouches.item(i);
@@ -155,7 +174,11 @@ export default class CanvasPage extends Page {
       }
 
       if (this._touchStarts.length >= 2) {
-        alert('Touch 2 or more points at the same time!');
+        if (this.state.isControlPanelOpened) {
+          this._closeControlPanel();
+        } else {
+          this._openControlPanel();
+        }
         this._touchStarts = [];
       }
     });
@@ -180,6 +203,8 @@ export default class CanvasPage extends Page {
   }
 
   render() {
+    const controlPanel = this.state.isControlPanelOpened ? <ControlPanel /> : null;
+
     return (
       <div
         className="canvas-page"
@@ -196,6 +221,7 @@ export default class CanvasPage extends Page {
           onTouchMove={ this._handleCanvasTouchMove.bind(this) }
           onTouchEnd={ this._handleCanvasTouchEnd.bind(this) }
         />
+        { controlPanel }
       </div>
     );
   }
