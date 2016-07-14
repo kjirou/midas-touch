@@ -7,6 +7,8 @@ import { PAGE_IDS } from './consts';
 
 
 window.document.addEventListener('DOMContentLoaded', () => {
+  //console.log('standalone:', window.navigator.standalone);
+
   const viewportSize = getViewportSize();
 
   const root = React.createElement(Root, {
