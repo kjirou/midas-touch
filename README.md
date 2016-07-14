@@ -1,2 +1,3 @@
 # midas-touch
-(Write Later)
+
+A freehand drawing based prototyping tool
