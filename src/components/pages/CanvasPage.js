@@ -41,6 +41,8 @@ export default class CanvasPage extends Page {
     this.state = {
       isControlPanelOpened: false
     };
+
+    this._handleBoundedWindowKeyDown = this._handleWindowKeyDown.bind(this);
   }
 
   _findCanvasNode() {
@@ -65,6 +67,14 @@ export default class CanvasPage extends Page {
 
   _closeControlPanel() {
     this.setState({ isControlPanelOpened: false });
+  }
+
+  _toggleControlPanel() {
+    if (this.state.isControlPanelOpened) {
+      this._closeControlPanel();
+    } else {
+      this._openControlPanel();
+    }
   }
 
   _undo() {
@@ -152,6 +162,26 @@ export default class CanvasPage extends Page {
     this._touchStarts = [];
   }
 
+  _handleWindowKeyDown(event) {
+    switch (event.keyCode) {
+      case 67:  // "c"
+        this._clear();
+        break;
+      case 68:  // "d"
+        console.log(this);
+        break;
+      case 82:  // "r"
+        this._redo();
+        break;
+      case 84:  // "t"
+        this._toggleControlPanel();
+        break;
+      case 85:  // "u"
+        this._undo();
+        break;
+    }
+  }
+
   componentDidMount() {
     const canvas = this._findCanvasNode();
     this._canvasContext = canvas.getContext('2d');
@@ -174,32 +204,16 @@ export default class CanvasPage extends Page {
       }
 
       if (this._touchStarts.length >= 2) {
-        if (this.state.isControlPanelOpened) {
-          this._closeControlPanel();
-        } else {
-          this._openControlPanel();
-        }
+        this._toggleControlPanel();
         this._touchStarts = [];
       }
     });
 
-    // For debug
-    window.addEventListener('keydown', (event) => {
-      switch (event.keyCode) {
-        case 67:  // "c"
-          this._clear();
-          break;
-        case 68:  // "d"
-          console.log(this);
-          break;
-        case 82:  // "r"
-          this._redo();
-          break;
-        case 85:  // "u"
-          this._undo();
-          break;
-      }
-    });
+    window.addEventListener('keydown', this._handleBoundedWindowKeyDown);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._handleBoundedWindowKeyDown);
   }
 
   render() {
