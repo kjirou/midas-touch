@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import EditHistory from '../../lib/EditHistory';
 import ControlPanel from '../ControlPanel';
 import Page from './Page';
 
@@ -26,12 +27,7 @@ export default class CanvasPage extends Page {
      */
     this._beforeMatrix = null;
 
-    /*
-     * {string[]} - [dataUri0, dataUri1, ..]
-     */
-    this._editHistory = [];
-
-    this._editHistoryCursor = -1;
+    this._editHistory = new EditHistory();
 
     /*
      * {object[]} - [{ timestamp }, { timestamp }, ..]
@@ -78,27 +74,20 @@ export default class CanvasPage extends Page {
   }
 
   _undo() {
-    const previousEditHistoryCursor = this._editHistoryCursor - 1;
-    const dataUri = this._editHistory[previousEditHistoryCursor];
+    const dataUri = this._editHistory.undo();
 
     if (dataUri) {
       this._clearCanvas();
       this._drawImageFromDataUri(dataUri);
-    }
-
-    if (previousEditHistoryCursor >= -1) {
-      this._editHistoryCursor = previousEditHistoryCursor;
     }
   }
 
   _redo() {
-    const nextEditHistoryCursor = this._editHistoryCursor + 1;
+    const dataUri = this._editHistory.redo();
 
-    const dataUri = this._editHistory[nextEditHistoryCursor];
     if (dataUri) {
       this._clearCanvas();
       this._drawImageFromDataUri(dataUri);
-      this._editHistoryCursor = nextEditHistoryCursor;
     }
   }
 
@@ -153,11 +142,7 @@ export default class CanvasPage extends Page {
   _handleCanvasTouchEnd(event) {
     const canvas = this._findCanvasNode();
 
-    // Add a history
-    this._editHistory = this._editHistory.slice(0, this._editHistoryCursor + 1);
-    this._editHistory.push(canvas.toDataURL());
-    this._editHistory = this._editHistory.slice(-20);
-    this._editHistoryCursor = this._editHistory.length - 1;
+    this._editHistory.add(canvas.toDataURL());
 
     this._touchStarts = [];
   }
