@@ -74,10 +74,10 @@ export default class CanvasPage extends Page {
   }
 
   _undo() {
-    const dataUri = this._editHistory.undo();
+    this._clearCanvas();
 
+    const dataUri = this._editHistory.undo();
     if (dataUri) {
-      this._clearCanvas();
       this._drawImageFromDataUri(dataUri);
     }
   }
