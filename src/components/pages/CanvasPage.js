@@ -42,7 +42,7 @@ export default class CanvasPage extends Page {
       isControlPanelOpened: false
     };
 
-    this._handleBoundedWindowKeyDown = this._handleWindowKeyDown.bind(this);
+    this._handleBoundedNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
   }
 
   _findCanvasNode() {
@@ -162,7 +162,7 @@ export default class CanvasPage extends Page {
     this._touchStarts = [];
   }
 
-  _handleWindowKeyDown(event) {
+  _handleNativeWindowKeyDown(event) {
     switch (event.keyCode) {
       case 67:  // "c"
         this._clearCanvas();
@@ -209,11 +209,11 @@ export default class CanvasPage extends Page {
       }
     });
 
-    window.addEventListener('keydown', this._handleBoundedWindowKeyDown);
+    window.addEventListener('keydown', this._handleBoundedNativeWindowKeyDown);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this._handleBoundedWindowKeyDown);
+    window.removeEventListener('keydown', this._handleBoundedNativeWindowKeyDown);
   }
 
   render() {
