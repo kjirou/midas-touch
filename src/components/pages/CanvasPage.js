@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import EditHistory from '../../lib/EditHistory';
 import ControlPanel from '../ControlPanel';
 import Page from './Page';
 
@@ -26,12 +27,7 @@ export default class CanvasPage extends Page {
      */
     this._beforeMatrix = null;
 
-    /*
-     * {string[]} - [dataUri0, dataUri1, ..]
-     */
-    this._editHistory = [];
-
-    this._editHistoryCursor = -1;
+    this._editHistory = new EditHistory();
 
     /*
      * {object[]} - [{ timestamp }, { timestamp }, ..]
@@ -41,13 +37,15 @@ export default class CanvasPage extends Page {
     this.state = {
       isControlPanelOpened: false
     };
+
+    this._handleBoundedNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
   }
 
   _findCanvasNode() {
     return ReactDOM.findDOMNode(this).querySelector('.js-canvas-page__canvas');
   }
 
-  _clear() {
+  _clearCanvas() {
     this._canvasContext.clearRect(0, 0,
       this.props.root.screenSize.width, this.props.root.screenSize.height);
   }
@@ -67,28 +65,29 @@ export default class CanvasPage extends Page {
     this.setState({ isControlPanelOpened: false });
   }
 
-  _undo() {
-    const previousEditHistoryCursor = this._editHistoryCursor - 1;
-    const dataUri = this._editHistory[previousEditHistoryCursor];
-
-    if (dataUri) {
-      this._clear();
-      this._drawImageFromDataUri(dataUri);
+  _toggleControlPanel() {
+    if (this.state.isControlPanelOpened) {
+      this._closeControlPanel();
+    } else {
+      this._openControlPanel();
     }
+  }
 
-    if (previousEditHistoryCursor >= -1) {
-      this._editHistoryCursor = previousEditHistoryCursor;
+  _undo() {
+    this._clearCanvas();
+
+    const dataUri = this._editHistory.undo();
+    if (dataUri) {
+      this._drawImageFromDataUri(dataUri);
     }
   }
 
   _redo() {
-    const nextEditHistoryCursor = this._editHistoryCursor + 1;
+    const dataUri = this._editHistory.redo();
 
-    const dataUri = this._editHistory[nextEditHistoryCursor];
     if (dataUri) {
-      this._clear();
+      this._clearCanvas();
       this._drawImageFromDataUri(dataUri);
-      this._editHistoryCursor = nextEditHistoryCursor;
     }
   }
 
@@ -143,13 +142,29 @@ export default class CanvasPage extends Page {
   _handleCanvasTouchEnd(event) {
     const canvas = this._findCanvasNode();
 
-    // Add a history
-    this._editHistory = this._editHistory.slice(0, this._editHistoryCursor + 1);
-    this._editHistory.push(canvas.toDataURL());
-    this._editHistory = this._editHistory.slice(-20);
-    this._editHistoryCursor = this._editHistory.length - 1;
+    this._editHistory.add(canvas.toDataURL());
 
     this._touchStarts = [];
+  }
+
+  _handleNativeWindowKeyDown(event) {
+    switch (event.keyCode) {
+      case 67:  // "c"
+        this._clearCanvas();
+        break;
+      case 68:  // "d"
+        console.log(this);
+        break;
+      case 82:  // "r"
+        this._redo();
+        break;
+      case 84:  // "t"
+        this._toggleControlPanel();
+        break;
+      case 85:  // "u"
+        this._undo();
+        break;
+    }
   }
 
   componentDidMount() {
@@ -174,32 +189,16 @@ export default class CanvasPage extends Page {
       }
 
       if (this._touchStarts.length >= 2) {
-        if (this.state.isControlPanelOpened) {
-          this._closeControlPanel();
-        } else {
-          this._openControlPanel();
-        }
+        this._toggleControlPanel();
         this._touchStarts = [];
       }
     });
 
-    // For debug
-    window.addEventListener('keydown', (event) => {
-      switch (event.keyCode) {
-        case 67:  // "c"
-          this._clear();
-          break;
-        case 68:  // "d"
-          console.log(this);
-          break;
-        case 82:  // "r"
-          this._redo();
-          break;
-        case 85:  // "u"
-          this._undo();
-          break;
-      }
-    });
+    window.addEventListener('keydown', this._handleBoundedNativeWindowKeyDown);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._handleBoundedNativeWindowKeyDown);
   }
 
   render() {
