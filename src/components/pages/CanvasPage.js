@@ -49,7 +49,7 @@ export default class CanvasPage extends Page {
     return ReactDOM.findDOMNode(this).querySelector('.js-canvas-page__canvas');
   }
 
-  _clear() {
+  _clearCanvas() {
     this._canvasContext.clearRect(0, 0,
       this.props.root.screenSize.width, this.props.root.screenSize.height);
   }
@@ -82,7 +82,7 @@ export default class CanvasPage extends Page {
     const dataUri = this._editHistory[previousEditHistoryCursor];
 
     if (dataUri) {
-      this._clear();
+      this._clearCanvas();
       this._drawImageFromDataUri(dataUri);
     }
 
@@ -96,7 +96,7 @@ export default class CanvasPage extends Page {
 
     const dataUri = this._editHistory[nextEditHistoryCursor];
     if (dataUri) {
-      this._clear();
+      this._clearCanvas();
       this._drawImageFromDataUri(dataUri);
       this._editHistoryCursor = nextEditHistoryCursor;
     }
@@ -165,7 +165,7 @@ export default class CanvasPage extends Page {
   _handleWindowKeyDown(event) {
     switch (event.keyCode) {
       case 67:  // "c"
-        this._clear();
+        this._clearCanvas();
         break;
       case 68:  // "d"
         console.log(this);
