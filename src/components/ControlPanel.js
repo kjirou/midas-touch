@@ -9,7 +9,10 @@ export default class ControlPanel extends React.Component {
 
     return (
       <div className={ classList.join(' ') }>
-        Control Panel!
+        <div className="control-panel__panel-list">
+          <div className="panel">Undo</div>
+          <div className="panel">Redo</div>
+        </div>
       </div>
     );
   }
