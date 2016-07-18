@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import EditHistory from '../../lib/EditHistory';
 import TouchStartReceiver from '../../lib/TouchStartReceiver';
+import { ignoreNativeUIEvents } from '../../lib/utils';
 import ControlPanel from '../ControlPanel';
 import Page from './Page';
 
@@ -32,6 +33,11 @@ export default class CanvasPage extends Page {
     };
 
     this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
+  }
+
+  static disableNativeEvent(event) {
+    event.stopPropagation();
+    event.preventDefault();
   }
 
   _findCanvasNode() {
@@ -82,26 +88,6 @@ export default class CanvasPage extends Page {
       this._clearCanvas();
       this._drawImageFromDataUri(dataUri);
     }
-  }
-
-  _handleScroll(event) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  _handleWheel(event) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  _handleCanvasClick() {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  _handleCanvasMouseDown() {
-    event.stopPropagation();
-    event.preventDefault();
   }
 
   _handleCanvasTouchStart(evnet) {
@@ -194,15 +180,15 @@ export default class CanvasPage extends Page {
     return (
       <div
         className="canvas-page"
-        onScroll={ this._handleScroll.bind(this) }
-        onWheel={ this._handleWheel.bind(this) }
+        onScroll={ ignoreNativeUIEvents.bind(this) }
+        onWheel={ ignoreNativeUIEvents.bind(this) }
       >
         <canvas
           className="js-canvas-page__canvas"
           width={ this.props.root.screenSize.width }
           height={ this.props.root.screenSize.height }
-          onClick={ this._handleCanvasClick.bind(this) }
-          onMouseDown={ this._handleCanvasMouseDown.bind(this) }
+          onClick={ ignoreNativeUIEvents.bind(this) }
+          onMouseDown={ ignoreNativeUIEvents.bind(this) }
           onTouchStart={ this._handleCanvasTouchStart.bind(this) }
           onTouchMove={ this._handleCanvasTouchMove.bind(this) }
           onTouchEnd={ this._handleCanvasTouchEnd.bind(this) }
