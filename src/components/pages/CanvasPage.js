@@ -10,7 +10,6 @@ import Page from './Page';
 
 // TODO:
 // - Adjust to the center of lineWidth
-// - Switch the Controll Panel position by the touched point
 // - Save to own device as the data-uri format
 // - (give up) Does not draw unexpected dots at the time of "touchstart"
 //   - It is a trade-off of the drawing response speed
@@ -30,7 +29,8 @@ export default class CanvasPage extends Page {
     this._beforeMatrix = null;
 
     this.state = {
-      isControlPanelOpened: false
+      isControlPanelOpened: false,
+      isControlPanelPlacedOnTop: false,
     };
 
     this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
@@ -57,19 +57,22 @@ export default class CanvasPage extends Page {
     this._canvasContext.drawImage(image, 0, 0, width, height);
   }
 
-  _openControlPanel() {
-    this.setState({ isControlPanelOpened: true });
+  _openControlPanel(isPlacedOnTop) {
+    this.setState({
+      isControlPanelOpened: true,
+      isControlPanelPlacedOnTop: isPlacedOnTop,
+    });
   }
 
   _closeControlPanel() {
     this.setState({ isControlPanelOpened: false });
   }
 
-  _toggleControlPanel() {
+  _toggleControlPanel(isPlacedOnTop) {
     if (this.state.isControlPanelOpened) {
       this._closeControlPanel();
     } else {
-      this._openControlPanel();
+      this._openControlPanel(isPlacedOnTop);
     }
   }
 
@@ -139,8 +142,10 @@ export default class CanvasPage extends Page {
       );
     }
 
-    if (this._touchStartReceiver.getActivePointsData(nowTimestamp).points.length >= 2) {
-      this._toggleControlPanel();
+    const activePointsData = this._touchStartReceiver.getActivePointsData(nowTimestamp);
+    if (activePointsData.points.length >= 2) {
+      const isPlacedOnTop = activePointsData.centerPoint.y < this.props.root.screenSize.height / 2;
+      this._toggleControlPanel(isPlacedOnTop);
     }
   }
 
@@ -156,7 +161,7 @@ export default class CanvasPage extends Page {
         this._redo();
         break;
       case 84:  // "t"
-        this._toggleControlPanel();
+        this._toggleControlPanel(false);
         break;
       case 85:  // "u"
         this._undo();
@@ -178,7 +183,8 @@ export default class CanvasPage extends Page {
   }
 
   render() {
-    const controlPanel = this.state.isControlPanelOpened ? <ControlPanel /> : null;
+    const controlPanel = this.state.isControlPanelOpened ?
+      <ControlPanel isPlacedOnTop={ this.state.isControlPanelPlacedOnTop } /> : null;
 
     return (
       <div
