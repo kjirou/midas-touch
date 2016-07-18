@@ -31,7 +31,7 @@ export default class CanvasPage extends Page {
       isControlPanelOpened: false
     };
 
-    this._handleBoundedNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
+    this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
   }
 
   _findCanvasNode() {
@@ -181,11 +181,11 @@ export default class CanvasPage extends Page {
       }
     });
 
-    window.addEventListener('keydown', this._handleBoundedNativeWindowKeyDown);
+    window.addEventListener('keydown', this._handleBoundNativeWindowKeyDown);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this._handleBoundedNativeWindowKeyDown);
+    window.removeEventListener('keydown', this._handleBoundNativeWindowKeyDown);
   }
 
   render() {
