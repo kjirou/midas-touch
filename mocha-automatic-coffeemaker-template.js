@@ -1,6 +1,6 @@
 module.exports = function generateModhaTestTemplate(data) {
   return [
-    'import assert from \'assert\';',
+    'import assert from \'power-assert\';',
     '',
     'import ' + data.noExtensionFileName + ' from \'' + data.noExtensionFilePath + '\';',
     '',
