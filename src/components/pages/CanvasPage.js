@@ -12,11 +12,6 @@ import Page from './Page';
 // - Switch the Controll Panel position by the touched point
 // - Save to own device as the data-uri format
 // - Does not draw unexpected dots at the time of "touchstart"
-
-
-const MULTI_TOUCH_RECEIVABLE_INTERVAL = 50;
-
-
 export default class CanvasPage extends Page {
 
   constructor() {
