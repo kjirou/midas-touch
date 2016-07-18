@@ -120,6 +120,30 @@ export default class CanvasPage extends Page {
     this._editHistory.add(canvas.toDataURL());
   }
 
+  /*
+   * It handles the native "touchstart" rather than the React's "onTouchStart",
+   *   because the "onTouchStart" does not have `event.changedTouches`.
+   */
+  _handleNativeCanvasTouchStart(event) {
+    const nowTimestamp = new Date().getTime();
+
+    // Suspend the drawing of the line
+    this._beforeMatrix = null;
+
+    for (let i = 0; i < event.changedTouches.length; i += 1) {
+      const touch = event.changedTouches.item(i);
+      this._touchStartReceiver.addPoint(
+        nowTimestamp,
+        Math.round(touch.clientX),
+        Math.round(touch.clientY)
+      );
+    }
+
+    if (this._touchStartReceiver.getActivePointsData(nowTimestamp).points.length >= 2) {
+      this._toggleControlPanel();
+    }
+  }
+
   _handleNativeWindowKeyDown(event) {
     switch (event.keyCode) {
       case 67:  // "c"
@@ -142,30 +166,10 @@ export default class CanvasPage extends Page {
 
   componentDidMount() {
     const canvas = this._findCanvasNode();
+
     this._canvasContext = canvas.getContext('2d');
 
-    // It uses the native "touchstart",
-    //   because the React Component's `onTouchStart` does not have `event.changedTouches`.
-    canvas.addEventListener('touchstart', (event) => {
-      const nowTimestamp = new Date().getTime();
-
-      // Suspend the drawing of the line
-      this._beforeMatrix = null;
-
-      for (let i = 0; i < event.changedTouches.length; i += 1) {
-        const touch = event.changedTouches.item(i);
-        this._touchStartReceiver.addPoint(
-          nowTimestamp,
-          Math.round(touch.clientX),
-          Math.round(touch.clientY)
-        );
-      }
-
-      if (this._touchStartReceiver.getActivePointsData(nowTimestamp).points.length >= 2) {
-        this._toggleControlPanel();
-      }
-    });
-
+    canvas.addEventListener('touchstart', this._handleNativeCanvasTouchStart.bind(this));
     window.addEventListener('keydown', this._handleBoundNativeWindowKeyDown);
   }
 
