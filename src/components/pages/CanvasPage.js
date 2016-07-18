@@ -90,10 +90,6 @@ export default class CanvasPage extends Page {
     }
   }
 
-  _handleCanvasTouchStart(evnet) {
-    this._beforeMatrix = null;
-  }
-
   _handleCanvasTouchMove(event) {
     event.stopPropagation();
     event.preventDefault();
@@ -153,6 +149,9 @@ export default class CanvasPage extends Page {
     canvas.addEventListener('touchstart', (event) => {
       const nowTimestamp = new Date().getTime();
 
+      // Suspend the drawing of the line
+      this._beforeMatrix = null;
+
       for (let i = 0; i < event.changedTouches.length; i += 1) {
         const touch = event.changedTouches.item(i);
         this._touchStartReceiver.addPoint(
@@ -189,7 +188,6 @@ export default class CanvasPage extends Page {
           height={ this.props.root.screenSize.height }
           onClick={ ignoreNativeUIEvents.bind(this) }
           onMouseDown={ ignoreNativeUIEvents.bind(this) }
-          onTouchStart={ this._handleCanvasTouchStart.bind(this) }
           onTouchMove={ this._handleCanvasTouchMove.bind(this) }
           onTouchEnd={ this._handleCanvasTouchEnd.bind(this) }
         />
