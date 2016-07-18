@@ -12,7 +12,8 @@ import Page from './Page';
 // - Adjust to the center of lineWidth
 // - Switch the Controll Panel position by the touched point
 // - Save to own device as the data-uri format
-// - Does not draw unexpected dots at the time of "touchstart"
+// - (give up) Does not draw unexpected dots at the time of "touchstart"
+//   - It is a trade-off of the drawing response speed
 export default class CanvasPage extends Page {
 
   constructor() {
@@ -91,8 +92,7 @@ export default class CanvasPage extends Page {
   }
 
   _handleCanvasTouchMove(event) {
-    event.stopPropagation();
-    event.preventDefault();
+    ignoreNativeUIEvents(event);
 
     const touch = event.changedTouches.item(0);
 
