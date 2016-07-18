@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import EditHistory from '../../lib/EditHistory';
 import TouchStartReceiver from '../../lib/TouchStartReceiver';
+import { ignoreNativeUIEvents } from '../../lib/utils';
 import ControlPanel from '../ControlPanel';
 import Page from './Page';
 
@@ -11,12 +12,8 @@ import Page from './Page';
 // - Adjust to the center of lineWidth
 // - Switch the Controll Panel position by the touched point
 // - Save to own device as the data-uri format
-// - Does not draw unexpected dots at the time of "touchstart"
-
-
-const MULTI_TOUCH_RECEIVABLE_INTERVAL = 50;
-
-
+// - (give up) Does not draw unexpected dots at the time of "touchstart"
+//   - It is a trade-off of the drawing response speed
 export default class CanvasPage extends Page {
 
   constructor() {
@@ -36,7 +33,12 @@ export default class CanvasPage extends Page {
       isControlPanelOpened: false
     };
 
-    this._handleBoundedNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
+    this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
+  }
+
+  static disableNativeEvent(event) {
+    event.stopPropagation();
+    event.preventDefault();
   }
 
   _findCanvasNode() {
@@ -89,33 +91,8 @@ export default class CanvasPage extends Page {
     }
   }
 
-  _handleScroll(event) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  _handleWheel(event) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  _handleCanvasClick() {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  _handleCanvasMouseDown() {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  _handleCanvasTouchStart(evnet) {
-    this._beforeMatrix = null;
-  }
-
   _handleCanvasTouchMove(event) {
-    event.stopPropagation();
-    event.preventDefault();
+    ignoreNativeUIEvents(event);
 
     const touch = event.changedTouches.item(0);
 
@@ -143,6 +120,30 @@ export default class CanvasPage extends Page {
     this._editHistory.add(canvas.toDataURL());
   }
 
+  /*
+   * It handles the native "touchstart" rather than the React's "onTouchStart",
+   *   because the "onTouchStart" does not have `event.changedTouches`.
+   */
+  _handleNativeCanvasTouchStart(event) {
+    const nowTimestamp = new Date().getTime();
+
+    // Suspend the drawing of the line
+    this._beforeMatrix = null;
+
+    for (let i = 0; i < event.changedTouches.length; i += 1) {
+      const touch = event.changedTouches.item(i);
+      this._touchStartReceiver.addPoint(
+        nowTimestamp,
+        Math.round(touch.clientX),
+        Math.round(touch.clientY)
+      );
+    }
+
+    if (this._touchStartReceiver.getActivePointsData(nowTimestamp).points.length >= 2) {
+      this._toggleControlPanel();
+    }
+  }
+
   _handleNativeWindowKeyDown(event) {
     switch (event.keyCode) {
       case 67:  // "c"
@@ -165,32 +166,15 @@ export default class CanvasPage extends Page {
 
   componentDidMount() {
     const canvas = this._findCanvasNode();
+
     this._canvasContext = canvas.getContext('2d');
 
-    // It uses the native "touchstart",
-    //   because the React Component's `onTouchStart` does not have `event.changedTouches`.
-    canvas.addEventListener('touchstart', (event) => {
-      const nowTimestamp = new Date().getTime();
-
-      for (let i = 0; i < event.changedTouches.length; i += 1) {
-        const touch = event.changedTouches.item(i);
-        this._touchStartReceiver.addPoint(
-          nowTimestamp,
-          Math.round(touch.clientX),
-          Math.round(touch.clientY)
-        );
-      }
-
-      if (this._touchStartReceiver.getActivePointsData(nowTimestamp).points.length >= 2) {
-        this._toggleControlPanel();
-      }
-    });
-
-    window.addEventListener('keydown', this._handleBoundedNativeWindowKeyDown);
+    canvas.addEventListener('touchstart', this._handleNativeCanvasTouchStart.bind(this));
+    window.addEventListener('keydown', this._handleBoundNativeWindowKeyDown);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this._handleBoundedNativeWindowKeyDown);
+    window.removeEventListener('keydown', this._handleBoundNativeWindowKeyDown);
   }
 
   render() {
@@ -199,16 +183,15 @@ export default class CanvasPage extends Page {
     return (
       <div
         className="canvas-page"
-        onScroll={ this._handleScroll.bind(this) }
-        onWheel={ this._handleWheel.bind(this) }
+        onScroll={ ignoreNativeUIEvents.bind(this) }
+        onWheel={ ignoreNativeUIEvents.bind(this) }
       >
         <canvas
           className="js-canvas-page__canvas"
           width={ this.props.root.screenSize.width }
           height={ this.props.root.screenSize.height }
-          onClick={ this._handleCanvasClick.bind(this) }
-          onMouseDown={ this._handleCanvasMouseDown.bind(this) }
-          onTouchStart={ this._handleCanvasTouchStart.bind(this) }
+          onClick={ ignoreNativeUIEvents.bind(this) }
+          onMouseDown={ ignoreNativeUIEvents.bind(this) }
           onTouchMove={ this._handleCanvasTouchMove.bind(this) }
           onTouchEnd={ this._handleCanvasTouchEnd.bind(this) }
         />
