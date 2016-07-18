@@ -2,14 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import EditHistory from '../../lib/EditHistory';
+import TouchStartReceiver from '../../lib/TouchStartReceiver';
 import ControlPanel from '../ControlPanel';
 import Page from './Page';
 
 
-// TODO
+// TODO:
 // - Adjust to the center of lineWidth
 // - Switch the Controll Panel position by the touched point
 // - Save to own device as the data-uri format
+// - Does not draw unexpected dots at the time of "touchstart"
 
 
 const MULTI_TOUCH_RECEIVABLE_INTERVAL = 50;
@@ -20,19 +22,15 @@ export default class CanvasPage extends Page {
   constructor() {
     super();
 
+    this._editHistory = new EditHistory();
+    this._touchStartReceiver = new TouchStartReceiver();
+
     this._canvasContext = null;
 
     /*
      * {(number[]|null)} - [x, y]
      */
     this._beforeMatrix = null;
-
-    this._editHistory = new EditHistory();
-
-    /*
-     * {object[]} - [{ timestamp }, { timestamp }, ..]
-     */
-    this._touchStarts = [];
 
     this.state = {
       isControlPanelOpened: false
@@ -143,8 +141,6 @@ export default class CanvasPage extends Page {
     const canvas = this._findCanvasNode();
 
     this._editHistory.add(canvas.toDataURL());
-
-    this._touchStarts = [];
   }
 
   _handleNativeWindowKeyDown(event) {
@@ -171,26 +167,22 @@ export default class CanvasPage extends Page {
     const canvas = this._findCanvasNode();
     this._canvasContext = canvas.getContext('2d');
 
-    // Original multiple touch points event handler
-    //   It uses the native "touchstart",
-    //   because the React Component's `onTouchStart` does not have `event.changedTouches` now
+    // It uses the native "touchstart",
+    //   because the React Component's `onTouchStart` does not have `event.changedTouches`.
     canvas.addEventListener('touchstart', (event) => {
       const nowTimestamp = new Date().getTime();
 
-      this._touchStarts = this._touchStarts.filter(touchStart => {
-        return touchStart.timestamp > nowTimestamp - MULTI_TOUCH_RECEIVABLE_INTERVAL;
-      });
-
       for (let i = 0; i < event.changedTouches.length; i += 1) {
         const touch = event.changedTouches.item(i);
-        this._touchStarts.push({
-          timestamp: nowTimestamp,
-        });
+        this._touchStartReceiver.addPoint(
+          nowTimestamp,
+          Math.round(touch.clientX),
+          Math.round(touch.clientY)
+        );
       }
 
-      if (this._touchStarts.length >= 2) {
+      if (this._touchStartReceiver.getActivePointsData(nowTimestamp).points.length >= 2) {
         this._toggleControlPanel();
-        this._touchStarts = [];
       }
     });
 
