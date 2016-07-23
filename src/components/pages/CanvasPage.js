@@ -51,11 +51,6 @@ export default class CanvasPage extends Page {
     this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
   }
 
-  static disableNativeEvent(event) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
   _findCanvasNode() {
     return ReactDOM.findDOMNode(this).querySelector('.js-canvas-page__canvas');
   }
