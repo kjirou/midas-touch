@@ -6,6 +6,7 @@
   "bugs": {
     "url": "https://github.com/kjirou/midas-touch/issues"
   },
+  "dependencies": {},
   "devDependencies": {
     "@kjirou/utils": "0.0.2",
     "babel": "6.5.2",
@@ -14,6 +15,7 @@
     "babel-preset-react": "6.5.0",
     "babel-register": "6.7.2",
     "babelify": "7.3.0",
+    "baobab": "2.3.3",
     "bemmer": "1.1.0",
     "browser-sync": "2.11.1",
     "browserify": "13.0.0",

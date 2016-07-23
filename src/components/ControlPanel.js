@@ -4,9 +4,14 @@ import React from 'react';
 export default class ControlPanel extends React.Component {
 
   _createButtons() {
-    return this.props.buttons.map(({ label, carrier }, index) => {
+    return this.props.buttons.map(({ label, classList, carrier }, index) => {
+      const className = ['panel'].concat(classList).join(' ');
       const handler = carrier.bindContexts(this);
-      return <div key={ `button-${ index }` } className="panel" onMouseDown={ handler }>{ label }</div>;
+
+      return <div
+        key={ `button-${ index }` }
+        className={ className }
+        onMouseDown={ handler }>{ label }</div>;
     });
   }
 
