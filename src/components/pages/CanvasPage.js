@@ -10,6 +10,7 @@ import Page from './Page';
 
 
 // TODO:
+// - Tools system
 // - The Pen button
 // - The Eraser button
 // - Apply the Google's Icons to buttons
@@ -30,6 +31,11 @@ export default class CanvasPage extends Page {
      * {(number[]|null)} - [x, y]
      */
     this._beforeMatrix = null;
+
+    /*
+     * {number} - A integer >= 1
+     */
+    this._penWidth = 1;
 
     this.state = {
       buttons: [
@@ -118,7 +124,7 @@ export default class CanvasPage extends Page {
     ];
 
     if (beforeMatrix !== null) {
-      this._canvasContext.lineWidth = 1;
+      this._canvasContext.lineWidth = this._penWidth;
       this._canvasContext.beginPath();
       this._canvasContext.moveTo(beforeMatrix[0], beforeMatrix[1]);
       this._canvasContext.lineTo(currentMatrix[0], currentMatrix[1]);
