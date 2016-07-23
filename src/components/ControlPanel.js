@@ -3,6 +3,13 @@ import React from 'react';
 
 export default class ControlPanel extends React.Component {
 
+  _createButtons() {
+    return this.props.buttons.map(({ label, carrier }, index) => {
+      const handler = carrier.bindContexts(this);
+      return <div key={ `button-${ index }` } className="panel" onMouseDown={ handler }>{ label }</div>;
+    });
+  }
+
   render() {
     const classList = ['control-panel'];
     if (this.props.isPlacedOnTop) classList.push('control-panel--is-placed-on-top');
@@ -10,8 +17,7 @@ export default class ControlPanel extends React.Component {
     return (
       <div className={ classList.join(' ') }>
         <div className="control-panel__panel-list">
-          <div className="panel">Undo</div>
-          <div className="panel">Redo</div>
+          { this._createButtons() }
         </div>
       </div>
     );
@@ -20,6 +26,7 @@ export default class ControlPanel extends React.Component {
 
 Object.assign(ControlPanel, {
   propTypes: {
+    buttons: React.PropTypes.array.isRequired,
     isPlacedOnTop: React.PropTypes.bool.isRequired,
   },
 });
