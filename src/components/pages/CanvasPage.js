@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import EditHistory from '../../lib/EditHistory';
+import EventHandlerCarrier from '../../lib/EventHandlerCarrier';
 import TouchStartReceiver from '../../lib/TouchStartReceiver';
 import { ignoreNativeUIEvents } from '../../lib/utils';
 import ControlPanel from '../ControlPanel';
@@ -29,6 +30,20 @@ export default class CanvasPage extends Page {
     this._beforeMatrix = null;
 
     this.state = {
+      buttons: [
+        {
+          label: 'Undo',
+          carrier: new EventHandlerCarrier(() => {
+            this._undo();
+          }, ControlPanel),
+        },
+        {
+          label: 'Redo',
+          carrier: new EventHandlerCarrier(() => {
+            this._redo();
+          }, ControlPanel),
+        },
+      ],
       isControlPanelOpened: false,
       isControlPanelPlacedOnTop: false,
     };
@@ -183,8 +198,13 @@ export default class CanvasPage extends Page {
   }
 
   render() {
-    const controlPanel = this.state.isControlPanelOpened ?
-      <ControlPanel isPlacedOnTop={ this.state.isControlPanelPlacedOnTop } /> : null;
+    let controlPanel = null;
+    if (this.state.isControlPanelOpened) {
+      controlPanel = <ControlPanel
+        isPlacedOnTop={ this.state.isControlPanelPlacedOnTop }
+        buttons={ this.state.buttons }
+      />;
+    }
 
     return (
       <div
