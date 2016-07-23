@@ -10,10 +10,12 @@ import Page from './Page';
 
 
 // TODO:
+// - The Pen button
+// - The Eraser button
+// - Apply the Google's Icons to buttons
 // - Adjust to the center of lineWidth
 // - Save to own device as the data-uri format
-// - (give up) Does not draw unexpected dots at the time of "touchstart"
-//   - It is a trade-off of the drawing response speed
+// - Save default width/height at first access
 export default class CanvasPage extends Page {
 
   constructor() {
