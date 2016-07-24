@@ -41,17 +41,17 @@ export default class CanvasPage extends Page {
         buttons: [
           {
             label: 'Undo',
-            classList: [''],
+            classList: [],
             action: new EventHandlerCarrier(() => this._undo()),
           },
           {
             label: 'Redo',
-            classList: [''],
+            classList: [],
             action: new EventHandlerCarrier(() => this._redo()),
           },
           {
             label: 'Pen',
-            classList: ['js-pen-button'],
+            classList: [],
             action: new EventHandlerCarrier(() => this._togglePenTool()),
           },
         ],
