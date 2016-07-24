@@ -192,7 +192,10 @@ export default class CanvasPage extends Page {
   _handleCanvasTouchEnd(event) {
     const canvas = this._findCanvasNode();
 
-    this._editHistory.add(canvas.toDataURL());
+    // Check the "onTouchMove" emission
+    if (this._beforeMatrix !== null) {
+      this._editHistory.add(canvas.toDataURL());
+    }
   }
 
   /*
