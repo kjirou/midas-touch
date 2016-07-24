@@ -12,7 +12,6 @@ import Page from './Page';
 
 
 // TODO:
-// - [bug] The Undo/Redo is not working in iPhone6
 // - The Eraser button
 // - Apply the Google's Icons to buttons
 // - Make to slide-x tool buttons
@@ -94,19 +93,31 @@ export default class CanvasPage extends Page {
       this.props.root.screenSize.width, this.props.root.screenSize.height);
   }
 
-  _drawImageFromDataUri(dataUri) {
+  /*
+   * @return {Promise}
+   */
+  _restoreImageFromDataUri(dataUri) {
     const { width, height } = this.props.root.screenSize;
     const image = new Image(width, height);
-    image.src = dataUri;
-    this._canvasContext.drawImage(image, 0, 0, width, height);
+
+    return new Promise((resolve) => {
+      image.src = dataUri;
+      // This `onload` should be use at least for the Moblie Safari
+      image.onload = () => {
+        this._clearCanvas();
+        this._canvasContext.drawImage(image, 0, 0, width, height);
+        resolve();
+      }
+    });
   }
 
   _undo() {
-    this._clearCanvas();
-
     const dataUri = this._editHistory.undo();
+
     if (dataUri) {
-      this._drawImageFromDataUri(dataUri);
+      this._restoreImageFromDataUri(dataUri);
+    } else {
+      this._clearCanvas();
     }
   }
 
@@ -114,8 +125,9 @@ export default class CanvasPage extends Page {
     const dataUri = this._editHistory.redo();
 
     if (dataUri) {
+      this._restoreImageFromDataUri(dataUri);
+    } else {
       this._clearCanvas();
-      this._drawImageFromDataUri(dataUri);
     }
   }
 
