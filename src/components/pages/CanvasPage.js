@@ -94,6 +94,7 @@ export default class CanvasPage extends Page {
   }
 
   /*
+   * TODO: This async processing is not managed
    * @return {Promise}
    */
   _restoreImageFromDataUri(dataUri) {
