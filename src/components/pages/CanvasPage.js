@@ -12,11 +12,11 @@ import Page from './Page';
 
 
 // TODO:
-// - Tools system
-// - The Pen button
+// - [bug] The Undo/Redo is not working in iPhone6
+// - [bug] The response of touch button is slow
 // - The Eraser button
 // - Apply the Google's Icons to buttons
-// - Adjust to the center of lineWidth
+// - Make to slide-x tool buttons
 // - Save to own device as the data-uri format
 // - Save default width/height at first access
 export default class CanvasPage extends Page {
@@ -72,6 +72,14 @@ export default class CanvasPage extends Page {
            * @param {number} - A integer >= 1
            */
           penWidth: 1,
+
+          plusAction: new EventHandlerCarrier(() => {
+            this._alterPenWidth(2);
+          }, PenTool),
+
+          minusAction: new EventHandlerCarrier(() => {
+            this._alterPenWidth(-2);
+          }, PenTool),
         },
       },
     });
@@ -146,6 +154,17 @@ export default class CanvasPage extends Page {
     }
 
     this._syncState();
+  }
+
+  _setPenWidth(value) {
+    const limitedValue = Math.min(Math.max(value, 1), 15);
+    this._stateTree.set(['tools', 'pen', 'penWidth'], limitedValue);
+    this._syncState();
+  }
+
+  _alterPenWidth(delta) {
+    const nextPenWidth = this._stateTree.get(['tools', 'pen', 'penWidth']) + delta;
+    this._setPenWidth(nextPenWidth);
   }
 
   _handleCanvasTouchMove(event) {
@@ -252,10 +271,11 @@ export default class CanvasPage extends Page {
     }
 
     const createPenTool = (state) => {
-      return <PenTool
-        isOnTop={ state.toolbox.isOnTop }
-        penWidth={ state.tools.pen.penWidth }
-      />;
+      return <PenTool {
+        ...Object.assign({}, state.tools.pen, {
+          isOnTop: state.toolbox.isOnTop,
+        })
+      }/>
     }
 
 
