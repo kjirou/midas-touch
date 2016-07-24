@@ -36,32 +36,32 @@ export default class CanvasPage extends Page {
     this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
 
     this._stateTree = new Baobab({
-      buttons: [
-        {
-          label: 'Undo',
-          classList: [''],
-          action: new EventHandlerCarrier(() => {
-            this._undo();
-          }, Toolbox),
-        },
-        {
-          label: 'Redo',
-          classList: [''],
-          action: new EventHandlerCarrier(() => {
-            this._redo();
-          }, Toolbox),
-        },
-        {
-          label: 'Pen',
-          classList: ['js-pen-button'],
-          action: new EventHandlerCarrier(() => {
-            this._togglePenTool();
-          }, Toolbox),
-        },
-      ],
       toolbox: {
         isShowing: false,
         isOnTop: false,
+        buttons: [
+          {
+            label: 'Undo',
+            classList: [''],
+            action: new EventHandlerCarrier(() => {
+              this._undo();
+            }, Toolbox),
+          },
+          {
+            label: 'Redo',
+            classList: [''],
+            action: new EventHandlerCarrier(() => {
+              this._redo();
+            }, Toolbox),
+          },
+          {
+            label: 'Pen',
+            classList: ['js-pen-button'],
+            action: new EventHandlerCarrier(() => {
+              this._togglePenTool();
+            }, Toolbox),
+          },
+        ],
       },
       tools: {
         pen: {
@@ -268,7 +268,7 @@ export default class CanvasPage extends Page {
     const createToolbox = (state) => {
       return <Toolbox
         isOnTop={ state.toolbox.isOnTop }
-        buttons={ state.buttons }
+        buttons={ state.toolbox.buttons }
       />;
     }
 
