@@ -2,6 +2,7 @@ import Baobab from 'baobab';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import { POINTER_TYPES } from '../../consts';
 import EditHistory from '../../lib/EditHistory';
 import EventHandlerCarrier from '../../lib/EventHandlerCarrier';
 import TouchStartReceiver from '../../lib/TouchStartReceiver';
@@ -21,10 +22,6 @@ export default class CanvasPage extends Page {
   constructor() {
     super();
 
-    this._editHistory = new EditHistory();
-
-    this._touchStartReceiver = new TouchStartReceiver();
-
     this._canvasContext = null;
 
     /*
@@ -32,13 +29,30 @@ export default class CanvasPage extends Page {
      */
     this._beforeMatrix = null;
 
+    this._editHistory = new EditHistory();
+
+    this._touchStartReceiver = new TouchStartReceiver();
+
     this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
 
     this._stateTree = new Baobab({
+      pointer: {
+        type: POINTER_TYPES.PEN,
+      },
       toolbox: {
         isShowing: false,
         isOnTop: false,
         buttons: [
+          {
+            label: 'P',
+            classList: [],
+            action: new EventHandlerCarrier(() => this._togglePointerTypeAction()),
+          },
+          {
+            label: 'Pen',
+            classList: [],
+            action: new EventHandlerCarrier(() => this._togglePenTool()),
+          },
           {
             label: 'Undo',
             classList: [],
@@ -48,11 +62,6 @@ export default class CanvasPage extends Page {
             label: 'Redo',
             classList: [],
             action: new EventHandlerCarrier(() => this._redo()),
-          },
-          {
-            label: 'Pen',
-            classList: [],
-            action: new EventHandlerCarrier(() => this._togglePenTool()),
           },
         ],
       },
@@ -110,6 +119,26 @@ export default class CanvasPage extends Page {
         resolve();
       }
     });
+  }
+
+  _togglePointerTypeAction() {
+    const pointerCursor = this._stateTree.select('pointer');
+
+    const nextPointerType = {
+      [POINTER_TYPES.PEN]: POINTER_TYPES.ERASER,
+      [POINTER_TYPES.ERASER]: POINTER_TYPES.PEN,
+    }[pointerCursor.get('type')];
+
+    pointerCursor.set('type', nextPointerType);
+
+    const label = {
+      [POINTER_TYPES.PEN]: 'P',
+      [POINTER_TYPES.ERASER]: 'E',
+    }[nextPointerType];
+
+    this._stateTree.set(['toolbox', 'buttons', '0', 'label'], label);
+
+    this._syncState();
   }
 
   _undo() {
