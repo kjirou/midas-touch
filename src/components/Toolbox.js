@@ -4,9 +4,9 @@ import React from 'react';
 export default class Toolbox extends React.Component {
 
   _createButtons() {
-    return this.props.buttons.map(({ label, classList, carrier }, index) => {
+    return this.props.buttons.map(({ label, classList, action }, index) => {
       const className = ['tool-button'].concat(classList).join(' ');
-      const handler = carrier.bindContexts(this);
+      const handler = action.bindContexts(this);
 
       return <div
         key={ `button-${ index }` }
