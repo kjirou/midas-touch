@@ -11,7 +11,7 @@ export default class Toolbox extends React.Component {
       return <div
         key={ `button-${ index }` }
         className={ className }
-        onMouseDown={ handler }>{ label }</div>;
+        onTouchStart={ handler }>{ label }</div>;
     });
   }
 

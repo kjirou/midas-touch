@@ -13,7 +13,6 @@ import Page from './Page';
 
 // TODO:
 // - [bug] The Undo/Redo is not working in iPhone6
-// - [bug] The response of touch button is slow
 // - The Eraser button
 // - Apply the Google's Icons to buttons
 // - Make to slide-x tool buttons
