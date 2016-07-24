@@ -43,23 +43,17 @@ export default class CanvasPage extends Page {
           {
             label: 'Undo',
             classList: [''],
-            action: new EventHandlerCarrier(() => {
-              this._undo();
-            }, Toolbox),
+            action: new EventHandlerCarrier(() => this._undo()),
           },
           {
             label: 'Redo',
             classList: [''],
-            action: new EventHandlerCarrier(() => {
-              this._redo();
-            }, Toolbox),
+            action: new EventHandlerCarrier(() => this._redo()),
           },
           {
             label: 'Pen',
             classList: ['js-pen-button'],
-            action: new EventHandlerCarrier(() => {
-              this._togglePenTool();
-            }, Toolbox),
+            action: new EventHandlerCarrier(() => this._togglePenTool()),
           },
         ],
       },
@@ -72,13 +66,8 @@ export default class CanvasPage extends Page {
            */
           penWidth: 1,
 
-          plusAction: new EventHandlerCarrier(() => {
-            this._alterPenWidth(2);
-          }, PenTool),
-
-          minusAction: new EventHandlerCarrier(() => {
-            this._alterPenWidth(-2);
-          }, PenTool),
+          plusAction: new EventHandlerCarrier(() => this._alterPenWidth(2)),
+          minusAction: new EventHandlerCarrier(() => this._alterPenWidth(-2)),
         },
       },
     });
