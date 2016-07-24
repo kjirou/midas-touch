@@ -1,11 +1,11 @@
 import React from 'react';
 
 
-export default class ControlPanel extends React.Component {
+export default class Toolbox extends React.Component {
 
   _createButtons() {
     return this.props.buttons.map(({ label, classList, carrier }, index) => {
-      const className = ['panel'].concat(classList).join(' ');
+      const className = ['tool-button'].concat(classList).join(' ');
       const handler = carrier.bindContexts(this);
 
       return <div
@@ -16,12 +16,12 @@ export default class ControlPanel extends React.Component {
   }
 
   render() {
-    const classList = ['control-panel'];
-    if (this.props.isPlacedOnTop) classList.push('control-panel--is-placed-on-top');
+    const classList = ['toolbox'];
+    if (this.props.isOnTop) classList.push('toolbox--is-on-top');
 
     return (
       <div className={ classList.join(' ') }>
-        <div className="control-panel__panel-list">
+        <div className="toolbox__tool-buttons">
           { this._createButtons() }
         </div>
       </div>
@@ -29,9 +29,9 @@ export default class ControlPanel extends React.Component {
   }
 }
 
-Object.assign(ControlPanel, {
+Object.assign(Toolbox, {
   propTypes: {
     buttons: React.PropTypes.array.isRequired,
-    isPlacedOnTop: React.PropTypes.bool.isRequired,
+    isOnTop: React.PropTypes.bool.isRequired,
   },
 });

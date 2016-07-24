@@ -5,8 +5,8 @@ import ReactDOM from 'react-dom';
 import EditHistory from '../../lib/EditHistory';
 import EventHandlerCarrier from '../../lib/EventHandlerCarrier';
 import TouchStartReceiver from '../../lib/TouchStartReceiver';
-import { cloneViaJson, ignoreNativeUIEvents } from '../../lib/utils';
-import ControlPanel from '../ControlPanel';
+import { ignoreNativeUIEvents } from '../../lib/utils';
+import Toolbox from '../Toolbox';
 import PenTool from '../tools/PenTool';
 import Page from './Page';
 
@@ -43,23 +43,27 @@ export default class CanvasPage extends Page {
           classList: [''],
           carrier: new EventHandlerCarrier(() => {
             this._undo();
-          }, ControlPanel),
+          }, Toolbox),
         },
         {
           label: 'Redo',
           classList: [''],
           carrier: new EventHandlerCarrier(() => {
             this._redo();
-          }, ControlPanel),
+          }, Toolbox),
         },
         {
           label: 'Pen',
           classList: ['js-pen-button'],
           carrier: new EventHandlerCarrier(() => {
             this._togglePenTool();
-          }, ControlPanel),
+          }, Toolbox),
         },
       ],
+      toolbox: {
+        isShowing: false,
+        isOnTop: false,
+      },
       tools: {
         pen: {
           isShowing: false,
@@ -70,9 +74,6 @@ export default class CanvasPage extends Page {
           penWidth: 1,
         },
       },
-      isControlPanelOpened: true,
-      //isControlPanelOpened: false,
-      isControlPanelPlacedOnTop: false,
     });
 
     this.state = this._generateState();
@@ -122,23 +123,28 @@ export default class CanvasPage extends Page {
     }
   }
 
-  _toggleControlPanel(isPlacedOnTop) {
-    if (this._stateTree.get('isControlPanelOpened')) {
-      this._stateTree.set('isControlPanelOpened', false);
+  _toggleToolbox(isOnTop) {
+    const cursor = this._stateTree.select(['toolbox']);
+
+    if (cursor.get('isShowing')) {
+      cursor.set('isShowing', false);
     } else {
-      this._stateTree.set('isControlPanelOpened', true);
-      this._stateTree.set('isControlPanelPlacedOnTop', isPlacedOnTop);
+      cursor.set('isShowing', true);
+      cursor.set('isOnTop', isOnTop);
     }
+
     this._syncState();
   }
 
   _togglePenTool() {
     const cursor = this._stateTree.select(['tools', 'pen']);
+
     if (cursor.get('isShowing')) {
       cursor.set('isShowing', false);
     } else {
       cursor.set('isShowing', true);
     }
+
     this._syncState();
   }
 
@@ -192,8 +198,8 @@ export default class CanvasPage extends Page {
 
     const activePointsData = this._touchStartReceiver.getActivePointsData(nowTimestamp);
     if (activePointsData.points.length >= 2) {
-      const isPlacedOnTop = activePointsData.centerPoint.y < this.props.root.screenSize.height / 2;
-      this._toggleControlPanel(isPlacedOnTop);
+      const isOnTop = activePointsData.centerPoint.y < this.props.root.screenSize.height / 2;
+      this._toggleToolbox(isOnTop);
     }
   }
 
@@ -213,9 +219,9 @@ export default class CanvasPage extends Page {
         break;
       case 84:  // "t"
         if (shift) {
-          this._toggleControlPanel(true);
+          this._toggleToolbox(true);
         } else {
-          this._toggleControlPanel(false);
+          this._toggleToolbox(false);
         }
         break;
       case 85:  // "u"
@@ -238,22 +244,22 @@ export default class CanvasPage extends Page {
   }
 
   render() {
-    const createControlPanel = (state) => {
-      return <ControlPanel
-        isPlacedOnTop={ state.isControlPanelPlacedOnTop }
+    const createToolbox = (state) => {
+      return <Toolbox
+        isOnTop={ state.toolbox.isOnTop }
         buttons={ state.buttons }
       />;
     }
 
     const createPenTool = (state) => {
       return <PenTool
-        isOnTop={ state.isControlPanelPlacedOnTop }
+        isOnTop={ state.toolbox.isOnTop }
         penWidth={ state.tools.pen.penWidth }
       />;
     }
 
 
-    const controlPanel = this.state.isControlPanelOpened ? createControlPanel(this.state) : null;
+    const toolbox = this.state.toolbox.isShowing ? createToolbox(this.state) : null;
     const penTool = this.state.tools.pen.isShowing ? createPenTool(this.state) : null;
 
     return (
@@ -271,7 +277,7 @@ export default class CanvasPage extends Page {
           onTouchMove={ this._handleCanvasTouchMove.bind(this) }
           onTouchEnd={ this._handleCanvasTouchEnd.bind(this) }
         />
-        { controlPanel }
+        { toolbox }
         { penTool }
       </div>
     );
