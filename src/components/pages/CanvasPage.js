@@ -46,22 +46,22 @@ export default class CanvasPage extends Page {
           {
             label: 'P',
             classList: [],
-            action: new EventHandlerCarrier(() => this._togglePointerTypeAction()),
+            action: new EventHandlerCarrier(() => this._pointerToolboxButtonAction()),
           },
           {
             label: 'Pen',
             classList: [],
-            action: new EventHandlerCarrier(() => this._togglePenTool()),
+            action: new EventHandlerCarrier(() => this._penToolboxButtonAction()),
           },
           {
             label: 'Undo',
             classList: [],
-            action: new EventHandlerCarrier(() => this._undo()),
+            action: new EventHandlerCarrier(() => this._undoToolboxButtonAction()),
           },
           {
             label: 'Redo',
             classList: [],
-            action: new EventHandlerCarrier(() => this._redo()),
+            action: new EventHandlerCarrier(() => this._redoToolboxButtonAction()),
           },
         ],
       },
@@ -74,8 +74,8 @@ export default class CanvasPage extends Page {
            */
           penWidth: 1,
 
-          plusAction: new EventHandlerCarrier(() => this._alterPenWidth(2)),
-          minusAction: new EventHandlerCarrier(() => this._alterPenWidth(-2)),
+          plusAction: new EventHandlerCarrier(() => this._penToolPlusButtonAction()),
+          minusAction: new EventHandlerCarrier(() => this._penToolMinusButtonAction()),
         },
       },
     });
@@ -121,7 +121,7 @@ export default class CanvasPage extends Page {
     });
   }
 
-  _togglePointerTypeAction() {
+  _cyclePointerType() {
     const pointerCursor = this._stateTree.select('pointer');
 
     const nextPointerType = {
@@ -137,8 +137,6 @@ export default class CanvasPage extends Page {
     }[nextPointerType];
 
     this._stateTree.set(['toolbox', 'buttons', '0', 'label'], label);
-
-    this._syncState();
   }
 
   _undo() {
@@ -170,8 +168,6 @@ export default class CanvasPage extends Page {
       cursor.set('isShowing', true);
       cursor.set('isOnTop', isOnTop);
     }
-
-    this._syncState();
   }
 
   _togglePenTool() {
@@ -182,20 +178,62 @@ export default class CanvasPage extends Page {
     } else {
       cursor.set('isShowing', true);
     }
-
-    this._syncState();
   }
 
   _setPenWidth(value) {
     const limitedValue = Math.min(Math.max(value, 1), 15);
     this._stateTree.set(['tools', 'pen', 'penWidth'], limitedValue);
-    this._syncState();
   }
 
   _alterPenWidth(delta) {
     const nextPenWidth = this._stateTree.get(['tools', 'pen', 'penWidth']) + delta;
     this._setPenWidth(nextPenWidth);
   }
+
+
+  //
+  // Actions
+  //
+  // Mini flux cycle entry points
+  //
+
+  _toggleToolboxAction(isOnTop) {
+    this._toggleToolbox(isOnTop);
+    this._syncState();
+  }
+
+  _pointerToolboxButtonAction() {
+    this._cyclePointerType();
+    this._syncState();
+  }
+
+  _penToolboxButtonAction() {
+    this._togglePenTool();
+    this._syncState();
+  }
+
+  _undoToolboxButtonAction() {
+    this._undo();
+  }
+
+  _redoToolboxButtonAction() {
+    this._redo();
+  }
+
+  _penToolPlusButtonAction() {
+    this._alterPenWidth(2);
+    this._syncState();
+  }
+
+  _penToolMinusButtonAction() {
+    this._alterPenWidth(-2);
+    this._syncState();
+  }
+
+
+  //
+  // DOM Event Handlers
+  //
 
   _handleCanvasTouchMove(event) {
     ignoreNativeUIEvents(event);
@@ -251,7 +289,7 @@ export default class CanvasPage extends Page {
     const activePointsData = this._touchStartReceiver.getActivePointsData(nowTimestamp);
     if (activePointsData.points.length >= 2) {
       const isOnTop = activePointsData.centerPoint.y < this.props.root.screenSize.height / 2;
-      this._toggleToolbox(isOnTop);
+      this._toggleToolboxAction(isOnTop);
     }
   }
 
@@ -271,9 +309,9 @@ export default class CanvasPage extends Page {
         break;
       case 84:  // "t"
         if (shift) {
-          this._toggleToolbox(true);
+          this._toggleToolboxAction(true);
         } else {
-          this._toggleToolbox(false);
+          this._toggleToolboxAction(false);
         }
         break;
       case 85:  // "u"
@@ -281,6 +319,11 @@ export default class CanvasPage extends Page {
         break;
     }
   }
+
+
+  //
+  // React Lifecycle
+  //
 
   componentDidMount() {
     const canvas = this._findCanvasNode();
