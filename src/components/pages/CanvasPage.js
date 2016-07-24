@@ -12,7 +12,6 @@ import Page from './Page';
 
 
 // TODO:
-// - [bug] The Undo/Redo is not working in iPhone6
 // - The Eraser button
 // - Apply the Google's Icons to buttons
 // - Make to slide-x tool buttons
@@ -36,32 +35,26 @@ export default class CanvasPage extends Page {
     this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
 
     this._stateTree = new Baobab({
-      buttons: [
-        {
-          label: 'Undo',
-          classList: [''],
-          action: new EventHandlerCarrier(() => {
-            this._undo();
-          }, Toolbox),
-        },
-        {
-          label: 'Redo',
-          classList: [''],
-          action: new EventHandlerCarrier(() => {
-            this._redo();
-          }, Toolbox),
-        },
-        {
-          label: 'Pen',
-          classList: ['js-pen-button'],
-          action: new EventHandlerCarrier(() => {
-            this._togglePenTool();
-          }, Toolbox),
-        },
-      ],
       toolbox: {
         isShowing: false,
         isOnTop: false,
+        buttons: [
+          {
+            label: 'Undo',
+            classList: [''],
+            action: new EventHandlerCarrier(() => this._undo()),
+          },
+          {
+            label: 'Redo',
+            classList: [''],
+            action: new EventHandlerCarrier(() => this._redo()),
+          },
+          {
+            label: 'Pen',
+            classList: ['js-pen-button'],
+            action: new EventHandlerCarrier(() => this._togglePenTool()),
+          },
+        ],
       },
       tools: {
         pen: {
@@ -72,13 +65,8 @@ export default class CanvasPage extends Page {
            */
           penWidth: 1,
 
-          plusAction: new EventHandlerCarrier(() => {
-            this._alterPenWidth(2);
-          }, PenTool),
-
-          minusAction: new EventHandlerCarrier(() => {
-            this._alterPenWidth(-2);
-          }, PenTool),
+          plusAction: new EventHandlerCarrier(() => this._alterPenWidth(2)),
+          minusAction: new EventHandlerCarrier(() => this._alterPenWidth(-2)),
         },
       },
     });
@@ -105,19 +93,32 @@ export default class CanvasPage extends Page {
       this.props.root.screenSize.width, this.props.root.screenSize.height);
   }
 
-  _drawImageFromDataUri(dataUri) {
+  /*
+   * TODO: This async processing is not managed
+   * @return {Promise}
+   */
+  _restoreImageFromDataUri(dataUri) {
     const { width, height } = this.props.root.screenSize;
     const image = new Image(width, height);
-    image.src = dataUri;
-    this._canvasContext.drawImage(image, 0, 0, width, height);
+
+    return new Promise((resolve) => {
+      image.src = dataUri;
+      // This `onload` should be use at least for the Moblie Safari
+      image.onload = () => {
+        this._clearCanvas();
+        this._canvasContext.drawImage(image, 0, 0, width, height);
+        resolve();
+      }
+    });
   }
 
   _undo() {
-    this._clearCanvas();
-
     const dataUri = this._editHistory.undo();
+
     if (dataUri) {
-      this._drawImageFromDataUri(dataUri);
+      this._restoreImageFromDataUri(dataUri);
+    } else {
+      this._clearCanvas();
     }
   }
 
@@ -125,8 +126,9 @@ export default class CanvasPage extends Page {
     const dataUri = this._editHistory.redo();
 
     if (dataUri) {
+      this._restoreImageFromDataUri(dataUri);
+    } else {
       this._clearCanvas();
-      this._drawImageFromDataUri(dataUri);
     }
   }
 
@@ -192,7 +194,10 @@ export default class CanvasPage extends Page {
   _handleCanvasTouchEnd(event) {
     const canvas = this._findCanvasNode();
 
-    this._editHistory.add(canvas.toDataURL());
+    // Check the "onTouchMove" emission
+    if (this._beforeMatrix !== null) {
+      this._editHistory.add(canvas.toDataURL());
+    }
   }
 
   /*
@@ -265,7 +270,7 @@ export default class CanvasPage extends Page {
     const createToolbox = (state) => {
       return <Toolbox
         isOnTop={ state.toolbox.isOnTop }
-        buttons={ state.buttons }
+        buttons={ state.toolbox.buttons }
       />;
     }
 
