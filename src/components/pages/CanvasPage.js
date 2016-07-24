@@ -13,7 +13,6 @@ import Page from './Page';
 
 // TODO:
 // - [bug] The Undo/Redo is not working in iPhone6
-// - [bug] The response of touch button is slow
 // - The Eraser button
 // - Apply the Google's Icons to buttons
 // - Make to slide-x tool buttons
@@ -41,21 +40,21 @@ export default class CanvasPage extends Page {
         {
           label: 'Undo',
           classList: [''],
-          carrier: new EventHandlerCarrier(() => {
+          action: new EventHandlerCarrier(() => {
             this._undo();
           }, Toolbox),
         },
         {
           label: 'Redo',
           classList: [''],
-          carrier: new EventHandlerCarrier(() => {
+          action: new EventHandlerCarrier(() => {
             this._redo();
           }, Toolbox),
         },
         {
           label: 'Pen',
           classList: ['js-pen-button'],
-          carrier: new EventHandlerCarrier(() => {
+          action: new EventHandlerCarrier(() => {
             this._togglePenTool();
           }, Toolbox),
         },
