@@ -1,3 +1,4 @@
+import Baobab from 'baobab';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -5,21 +6,25 @@ import EditHistory from '../../lib/EditHistory';
 import EventHandlerCarrier from '../../lib/EventHandlerCarrier';
 import TouchStartReceiver from '../../lib/TouchStartReceiver';
 import { ignoreNativeUIEvents } from '../../lib/utils';
-import ControlPanel from '../ControlPanel';
+import Toolbox from '../Toolbox';
+import PenTool from '../tools/PenTool';
 import Page from './Page';
 
 
 // TODO:
-// - Adjust to the center of lineWidth
+// - [bug] The Undo/Redo is not working in iPhone6
+// - [bug] The response of touch button is slow
+// - The Eraser button
+// - Apply the Google's Icons to buttons
+// - Make to slide-x tool buttons
 // - Save to own device as the data-uri format
-// - (give up) Does not draw unexpected dots at the time of "touchstart"
-//   - It is a trade-off of the drawing response speed
+// - Save default width/height at first access
 export default class CanvasPage extends Page {
-
   constructor() {
     super();
 
     this._editHistory = new EditHistory();
+
     this._touchStartReceiver = new TouchStartReceiver();
 
     this._canvasContext = null;
@@ -29,26 +34,67 @@ export default class CanvasPage extends Page {
      */
     this._beforeMatrix = null;
 
-    this.state = {
+    this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
+
+    this._stateTree = new Baobab({
       buttons: [
         {
           label: 'Undo',
+          classList: [''],
           carrier: new EventHandlerCarrier(() => {
             this._undo();
-          }, ControlPanel),
+          }, Toolbox),
         },
         {
           label: 'Redo',
+          classList: [''],
           carrier: new EventHandlerCarrier(() => {
             this._redo();
-          }, ControlPanel),
+          }, Toolbox),
+        },
+        {
+          label: 'Pen',
+          classList: ['js-pen-button'],
+          carrier: new EventHandlerCarrier(() => {
+            this._togglePenTool();
+          }, Toolbox),
         },
       ],
-      isControlPanelOpened: false,
-      isControlPanelPlacedOnTop: false,
-    };
+      toolbox: {
+        isShowing: false,
+        isOnTop: false,
+      },
+      tools: {
+        pen: {
+          isShowing: false,
 
-    this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
+          /*
+           * @param {number} - A integer >= 1
+           */
+          penWidth: 1,
+
+          plusAction: new EventHandlerCarrier(() => {
+            this._alterPenWidth(2);
+          }, PenTool),
+
+          minusAction: new EventHandlerCarrier(() => {
+            this._alterPenWidth(-2);
+          }, PenTool),
+        },
+      },
+    });
+
+    this.state = this._generateState();
+  }
+
+  _generateState() {
+    const state = this._stateTree.get();
+
+    return state;
+  }
+
+  _syncState() {
+    this.setState(this._generateState());
   }
 
   _findCanvasNode() {
@@ -65,25 +111,6 @@ export default class CanvasPage extends Page {
     const image = new Image(width, height);
     image.src = dataUri;
     this._canvasContext.drawImage(image, 0, 0, width, height);
-  }
-
-  _openControlPanel(isPlacedOnTop) {
-    this.setState({
-      isControlPanelOpened: true,
-      isControlPanelPlacedOnTop: isPlacedOnTop,
-    });
-  }
-
-  _closeControlPanel() {
-    this.setState({ isControlPanelOpened: false });
-  }
-
-  _toggleControlPanel(isPlacedOnTop) {
-    if (this.state.isControlPanelOpened) {
-      this._closeControlPanel();
-    } else {
-      this._openControlPanel(isPlacedOnTop);
-    }
   }
 
   _undo() {
@@ -104,6 +131,42 @@ export default class CanvasPage extends Page {
     }
   }
 
+  _toggleToolbox(isOnTop) {
+    const cursor = this._stateTree.select(['toolbox']);
+
+    if (cursor.get('isShowing')) {
+      cursor.set('isShowing', false);
+    } else {
+      cursor.set('isShowing', true);
+      cursor.set('isOnTop', isOnTop);
+    }
+
+    this._syncState();
+  }
+
+  _togglePenTool() {
+    const cursor = this._stateTree.select(['tools', 'pen']);
+
+    if (cursor.get('isShowing')) {
+      cursor.set('isShowing', false);
+    } else {
+      cursor.set('isShowing', true);
+    }
+
+    this._syncState();
+  }
+
+  _setPenWidth(value) {
+    const limitedValue = Math.min(Math.max(value, 1), 15);
+    this._stateTree.set(['tools', 'pen', 'penWidth'], limitedValue);
+    this._syncState();
+  }
+
+  _alterPenWidth(delta) {
+    const nextPenWidth = this._stateTree.get(['tools', 'pen', 'penWidth']) + delta;
+    this._setPenWidth(nextPenWidth);
+  }
+
   _handleCanvasTouchMove(event) {
     ignoreNativeUIEvents(event);
 
@@ -116,7 +179,7 @@ export default class CanvasPage extends Page {
     ];
 
     if (beforeMatrix !== null) {
-      this._canvasContext.lineWidth = 1;
+      this._canvasContext.lineWidth = this._stateTree.get(['tools', 'pen', 'penWidth']);
       this._canvasContext.beginPath();
       this._canvasContext.moveTo(beforeMatrix[0], beforeMatrix[1]);
       this._canvasContext.lineTo(currentMatrix[0], currentMatrix[1]);
@@ -154,12 +217,15 @@ export default class CanvasPage extends Page {
 
     const activePointsData = this._touchStartReceiver.getActivePointsData(nowTimestamp);
     if (activePointsData.points.length >= 2) {
-      const isPlacedOnTop = activePointsData.centerPoint.y < this.props.root.screenSize.height / 2;
-      this._toggleControlPanel(isPlacedOnTop);
+      const isOnTop = activePointsData.centerPoint.y < this.props.root.screenSize.height / 2;
+      this._toggleToolbox(isOnTop);
     }
   }
 
   _handleNativeWindowKeyDown(event) {
+    const shift = event.shiftKey;
+    const ctrl = event.ctrlKey || event.metaKey;
+
     switch (event.keyCode) {
       case 67:  // "c"
         this._clearCanvas();
@@ -171,7 +237,11 @@ export default class CanvasPage extends Page {
         this._redo();
         break;
       case 84:  // "t"
-        this._toggleControlPanel(false);
+        if (shift) {
+          this._toggleToolbox(true);
+        } else {
+          this._toggleToolbox(false);
+        }
         break;
       case 85:  // "u"
         this._undo();
@@ -193,13 +263,24 @@ export default class CanvasPage extends Page {
   }
 
   render() {
-    let controlPanel = null;
-    if (this.state.isControlPanelOpened) {
-      controlPanel = <ControlPanel
-        isPlacedOnTop={ this.state.isControlPanelPlacedOnTop }
-        buttons={ this.state.buttons }
+    const createToolbox = (state) => {
+      return <Toolbox
+        isOnTop={ state.toolbox.isOnTop }
+        buttons={ state.buttons }
       />;
     }
+
+    const createPenTool = (state) => {
+      return <PenTool {
+        ...Object.assign({}, state.tools.pen, {
+          isOnTop: state.toolbox.isOnTop,
+        })
+      }/>
+    }
+
+
+    const toolbox = this.state.toolbox.isShowing ? createToolbox(this.state) : null;
+    const penTool = this.state.tools.pen.isShowing ? createPenTool(this.state) : null;
 
     return (
       <div
@@ -216,7 +297,8 @@ export default class CanvasPage extends Page {
           onTouchMove={ this._handleCanvasTouchMove.bind(this) }
           onTouchEnd={ this._handleCanvasTouchEnd.bind(this) }
         />
-        { controlPanel }
+        { toolbox }
+        { penTool }
       </div>
     );
   }

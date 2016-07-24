@@ -13,7 +13,9 @@ $app-color: #000000
 $app-width-scroll-bar: 20px
 $icon-height: 32px
 $icon-width: 32px
-$z-index-default: 1
+$z-index-app: 0
+$z-index-canvas-page-1: 1
+$z-index-canvas-page-2: 2
 
 
 //
@@ -53,6 +55,7 @@ body.is-development
     // Set the screen size according from the browser's viewport dynamically
     //width: $app-width
     //height: $app-height
+    z-index: $z-index-app
     background-color: $app-background-color
 
     .root__page-container
@@ -63,22 +66,22 @@ body.is-development
 
 
 //
-// Modules
+// Independent Components
 //
 .js-mt-container
 
-  .control-panel
+  .toolbox
     position: absolute
     width: 100%
     height: 64px
     bottom: 0
-    z-index: $z-index-default
+    z-index: $z-index-canvas-page-1
     background-color: #ff9900
 
-    &.control-panel--is-placed-on-top
+    &.toolbox--is-on-top
       top: 0
 
-    &__panel-list
+    &__tool-buttons
       display: flex
       flex-wrap: wrap
       justify-content: flex-start
@@ -88,12 +91,74 @@ body.is-development
       overflow: hidden
       background-color: silver
 
-      .panel
+      .tool-button
         margin: 0 0 0 8px
         width: 48px
         height: 48px
         background-color: yellow
         cursor: pointer
+
+
+//
+// Tools
+//
+.js-mt-container
+
+  @mixin tool-button-base()
+    width: 48px
+    height: 48px
+    line-height: 48px
+    font-size: 16px
+    text-align: center
+    color: black
+    background-color: yellow
+    cursor: pointer
+
+  @mixin tool-base()
+    position: absolute;
+    width: 0
+    height: 0
+    z-index: $z-index-canvas-page-2
+
+  @mixin tool-position($vertical-layout, $horizontal-layout)
+    $vertical-margin: 72px
+    @if $vertical-layout == "top" { top: $vertical-margin }
+    @if $vertical-layout == "middle" { top: 50% }
+    @if $vertical-layout == "bottom" { bottom: $vertical-margin }
+
+    @if $horizontal-layout == "left" { left: 0 }
+    @if $horizontal-layout == "middle" { left: 50% }
+    @if $horizontal-layout == "right" { right: 0 }
+
+    $layout-id: $vertical-layout + "-" + $horizontal-layout
+    @if $vertical-layout == "middle" { transform: translate(0, -50%) }
+    @if $horizontal-layout == "middle" { transform: translate(-50%, 0) }
+    @if $layout-id == "middle-middle" { transform: translate(-50%, -50%) }
+
+  .pen-tool
+    @include tool-base()
+    display: flex
+    flex-direction: column
+    width: 48px
+    height: 48px + 24px + 48px
+    @include tool-position("bottom", "middle")
+
+    &.pen-tool--is-on-top
+      @include tool-position("top", "middle")
+
+    .plus-button
+      @include tool-button-base()
+
+    .pen-width
+      width: 100%;
+      height: 24px
+      line-height: 24px
+      font-size: 16px
+      text-align: center;
+      background-color: silver
+
+    .minus-button
+      @include tool-button-base()
 
 
 //
