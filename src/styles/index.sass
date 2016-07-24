@@ -116,12 +116,24 @@ body.is-development
 
   @mixin tool-base()
     position: absolute;
-    // top and left are assigned by the JS dynamically
-    top: 0
-    left: 0
     width: 0
     height: 0
     z-index: $z-index-canvas-page-2
+
+  @mixin tool-position($vertical-layout, $horizontal-layout)
+    $vertical-margin: 72px
+    @if $vertical-layout == "top" { top: $vertical-margin }
+    @if $vertical-layout == "middle" { top: 50% }
+    @if $vertical-layout == "bottom" { bottom: $vertical-margin }
+
+    @if $horizontal-layout == "left" { left: 0 }
+    @if $horizontal-layout == "middle" { left: 50% }
+    @if $horizontal-layout == "right" { right: 0 }
+
+    $layout-id: $vertical-layout + "-" + $horizontal-layout
+    @if $vertical-layout == "middle" { transform: translate(0, -50%) }
+    @if $horizontal-layout == "middle" { transform: translate(-50%, 0) }
+    @if $layout-id == "middle-middle" { transform: translate(-50%, -50%) }
 
   .pen-tool
     @include tool-base()
@@ -129,6 +141,10 @@ body.is-development
     flex-direction: column
     width: 48px
     height: 48px + 24px + 48px
+    @include tool-position("bottom", "middle")
+
+    &.pen-tool--is-on-top
+      @include tool-position("top", "middle")
 
     .plus-button
       @include tool-button-base()

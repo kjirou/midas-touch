@@ -5,8 +5,11 @@ import Tool from './Tool';
 
 export default class PenTool extends Tool {
   render() {
+    const classList = ['pen-tool'];
+    if (this.props.isOnTop) classList.push('pen-tool--is-on-top');
+
     return (
-      <div className="pen-tool js-pen-tool">
+      <div className={ classList.join(' ') }>
         <div className="plus-button">+</div>
         <div className="pen-width">{ this.props.penWidth }</div>
         <div className="minus-button">-</div>
@@ -17,6 +20,7 @@ export default class PenTool extends Tool {
 
 Object.assign(PenTool, {
   propTypes: Object.assign({}, Tool.propTypes, {
+    isOnTop: React.PropTypes.bool.isRequired,
     penWidth: React.PropTypes.number.isRequired,
   }),
 });

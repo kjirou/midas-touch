@@ -198,6 +198,9 @@ export default class CanvasPage extends Page {
   }
 
   _handleNativeWindowKeyDown(event) {
+    const shift = event.shiftKey;
+    const ctrl = event.ctrlKey || event.metaKey;
+
     switch (event.keyCode) {
       case 67:  // "c"
         this._clearCanvas();
@@ -209,7 +212,11 @@ export default class CanvasPage extends Page {
         this._redo();
         break;
       case 84:  // "t"
-        this._toggleControlPanel(false);
+        if (shift) {
+          this._toggleControlPanel(true);
+        } else {
+          this._toggleControlPanel(false);
+        }
         break;
       case 85:  // "u"
         this._undo();
@@ -240,6 +247,7 @@ export default class CanvasPage extends Page {
 
     const createPenTool = (state) => {
       return <PenTool
+        isOnTop={ state.isControlPanelPlacedOnTop }
         penWidth={ state.tools.pen.penWidth }
       />;
     }
