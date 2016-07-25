@@ -200,7 +200,7 @@ export default class CanvasPage extends Page {
 
     switch (event.keyCode) {
       case 67:  // "c"
-        this._findCanvasNode().emitter.emit('clear');
+        this._findCanvasBoardNode().emitter.emit('clear');
         break;
       case 68:  // "d"
         console.log(this);
