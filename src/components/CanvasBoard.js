@@ -82,8 +82,6 @@ export default class CanvasBoard extends React.Component {
 
     if (dataUri) {
       this._restoreImageFromDataUri(dataUri);
-    } else {
-      this._clear();
     }
   }
 

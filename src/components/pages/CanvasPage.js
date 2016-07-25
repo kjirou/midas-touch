@@ -12,7 +12,6 @@ import Page from './Page';
 
 
 // TODO:
-// - [bug] over redo
 // - The Eraser button
 // - Apply the Google's Icons to buttons
 // - Make to slide-x tool buttons
