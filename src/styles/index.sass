@@ -70,6 +70,10 @@ body.is-development
 //
 .js-mt-container
 
+  .canvas-board
+    width: 100%
+    height: 100%
+
   .toolbox
     position: absolute
     width: 100%
@@ -177,6 +181,7 @@ body.is-development
   .canvas-page
     @include page-base()
 
-    &__canvas
+    .canvas-page__canvas-board-container
+      position: absolute
       width: 100%
       height: 100%

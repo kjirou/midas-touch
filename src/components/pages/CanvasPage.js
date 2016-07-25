@@ -3,16 +3,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { POINTER_TYPES } from '../../consts';
-import EditHistory from '../../lib/EditHistory';
 import EventHandlerCarrier from '../../lib/EventHandlerCarrier';
-import TouchStartReceiver from '../../lib/TouchStartReceiver';
 import { ignoreNativeUIEvents } from '../../lib/utils';
+import CanvasBoard from '../CanvasBoard';
 import Toolbox from '../Toolbox';
 import PenTool from '../tools/PenTool';
 import Page from './Page';
 
 
 // TODO:
+// - [bug] over redo
 // - The Eraser button
 // - Apply the Google's Icons to buttons
 // - Make to slide-x tool buttons
@@ -22,16 +22,7 @@ export default class CanvasPage extends Page {
   constructor() {
     super();
 
-    this._canvasContext = null;
-
-    /*
-     * {(number[]|null)} - [x, y]
-     */
-    this._beforeMatrix = null;
-
-    this._editHistory = new EditHistory();
-
-    this._touchStartReceiver = new TouchStartReceiver();
+    this._canvasBoard = null;
 
     this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
 
@@ -93,32 +84,14 @@ export default class CanvasPage extends Page {
     this.setState(this._generateState());
   }
 
-  _findCanvasNode() {
-    return ReactDOM.findDOMNode(this).querySelector('.js-canvas-page__canvas');
+  _findCanvasBoardContainerNode() {
+    const node =  ReactDOM.findDOMNode(this);
+    return node.querySelector('.js-canvas-page__canvas-board-container');
   }
 
-  _clearCanvas() {
-    this._canvasContext.clearRect(0, 0,
-      this.props.root.screenSize.width, this.props.root.screenSize.height);
-  }
-
-  /*
-   * TODO: This async processing is not managed
-   * @return {Promise}
-   */
-  _restoreImageFromDataUri(dataUri) {
-    const { width, height } = this.props.root.screenSize;
-    const image = new Image(width, height);
-
-    return new Promise((resolve) => {
-      image.src = dataUri;
-      // This `onload` should be use at least for the Moblie Safari
-      image.onload = () => {
-        this._clearCanvas();
-        this._canvasContext.drawImage(image, 0, 0, width, height);
-        resolve();
-      }
-    });
+  _findCanvasBoardNode() {
+    const node =  this._findCanvasBoardContainerNode();
+    return node.querySelector('.js-canvas-board');
   }
 
   _cyclePointerType() {
@@ -137,26 +110,6 @@ export default class CanvasPage extends Page {
     }[nextPointerType];
 
     this._stateTree.set(['toolbox', 'buttons', '0', 'label'], label);
-  }
-
-  _undo() {
-    const dataUri = this._editHistory.undo();
-
-    if (dataUri) {
-      this._restoreImageFromDataUri(dataUri);
-    } else {
-      this._clearCanvas();
-    }
-  }
-
-  _redo() {
-    const dataUri = this._editHistory.redo();
-
-    if (dataUri) {
-      this._restoreImageFromDataUri(dataUri);
-    } else {
-      this._clearCanvas();
-    }
   }
 
   _toggleToolbox(isOnTop) {
@@ -213,20 +166,26 @@ export default class CanvasPage extends Page {
   }
 
   _undoToolboxButtonAction() {
-    this._undo();
+    this._findCanvasBoardNode().emitter.emit('undo');
   }
 
   _redoToolboxButtonAction() {
-    this._redo();
+    this._findCanvasBoardNode().emitter.emit('redo');
   }
 
   _penToolPlusButtonAction() {
     this._alterPenWidth(2);
+    this._findCanvasBoardNode().emitter.emit('config', {
+      penWidth: this._stateTree.get(['tools', 'pen', 'penWidth']),
+    });
     this._syncState();
   }
 
   _penToolMinusButtonAction() {
     this._alterPenWidth(-2);
+    this._findCanvasBoardNode().emitter.emit('config', {
+      penWidth: this._stateTree.get(['tools', 'pen', 'penWidth']),
+    });
     this._syncState();
   }
 
@@ -235,77 +194,19 @@ export default class CanvasPage extends Page {
   // DOM Event Handlers
   //
 
-  _handleCanvasTouchMove(event) {
-    ignoreNativeUIEvents(event);
-
-    const touch = event.changedTouches.item(0);
-
-    const beforeMatrix = this._beforeMatrix;
-    const currentMatrix = [
-      Math.round(touch.clientX),
-      Math.round(touch.clientY),
-    ];
-
-    if (beforeMatrix !== null) {
-      this._canvasContext.lineWidth = this._stateTree.get(['tools', 'pen', 'penWidth']);
-      this._canvasContext.beginPath();
-      this._canvasContext.moveTo(beforeMatrix[0], beforeMatrix[1]);
-      this._canvasContext.lineTo(currentMatrix[0], currentMatrix[1]);
-      this._canvasContext.closePath();
-      this._canvasContext.stroke();
-    }
-
-    this._beforeMatrix = currentMatrix;
-  }
-
-  _handleCanvasTouchEnd(event) {
-    const canvas = this._findCanvasNode();
-
-    // Check the "onTouchMove" emission
-    if (this._beforeMatrix !== null) {
-      this._editHistory.add(canvas.toDataURL());
-    }
-  }
-
-  /*
-   * It handles the native "touchstart" rather than the React's "onTouchStart",
-   *   because the "onTouchStart" does not have `event.changedTouches`.
-   */
-  _handleNativeCanvasTouchStart(event) {
-    const nowTimestamp = new Date().getTime();
-
-    // Suspend the drawing of the line
-    this._beforeMatrix = null;
-
-    for (let i = 0; i < event.changedTouches.length; i += 1) {
-      const touch = event.changedTouches.item(i);
-      this._touchStartReceiver.addPoint(
-        nowTimestamp,
-        Math.round(touch.clientX),
-        Math.round(touch.clientY)
-      );
-    }
-
-    const activePointsData = this._touchStartReceiver.getActivePointsData(nowTimestamp);
-    if (activePointsData.points.length >= 2) {
-      const isOnTop = activePointsData.centerPoint.y < this.props.root.screenSize.height / 2;
-      this._toggleToolboxAction(isOnTop);
-    }
-  }
-
   _handleNativeWindowKeyDown(event) {
     const shift = event.shiftKey;
     const ctrl = event.ctrlKey || event.metaKey;
 
     switch (event.keyCode) {
       case 67:  // "c"
-        this._clearCanvas();
+        this._findCanvasNode().emitter.emit('clear');
         break;
       case 68:  // "d"
         console.log(this);
         break;
       case 82:  // "r"
-        this._redo();
+        this._redoToolboxButtonAction();
         break;
       case 84:  // "t"
         if (shift) {
@@ -315,7 +216,7 @@ export default class CanvasPage extends Page {
         }
         break;
       case 85:  // "u"
-        this._undo();
+        this._undoToolboxButtonAction();
         break;
     }
   }
@@ -326,16 +227,19 @@ export default class CanvasPage extends Page {
   //
 
   componentDidMount() {
-    const canvas = this._findCanvasNode();
-
-    this._canvasContext = canvas.getContext('2d');
-
-    canvas.addEventListener('touchstart', this._handleNativeCanvasTouchStart.bind(this));
     window.addEventListener('keydown', this._handleBoundNativeWindowKeyDown);
+
+    this._canvasBoard = <CanvasBoard
+      width={ this.props.root.screenSize.width }
+      height={ this.props.root.screenSize.height }
+    />;
+    ReactDOM.render(this._canvasBoard, this._findCanvasBoardContainerNode());
   }
 
   componentWillUnmount() {
     window.removeEventListener('keydown', this._handleBoundNativeWindowKeyDown);
+
+    ReactDOM.unmountComponentAtNode(this._findCanvasBoardContainerNode());
   }
 
   render() {
@@ -364,15 +268,7 @@ export default class CanvasPage extends Page {
         onScroll={ ignoreNativeUIEvents.bind(this) }
         onWheel={ ignoreNativeUIEvents.bind(this) }
       >
-        <canvas
-          className="js-canvas-page__canvas"
-          width={ this.props.root.screenSize.width }
-          height={ this.props.root.screenSize.height }
-          onClick={ ignoreNativeUIEvents.bind(this) }
-          onMouseDown={ ignoreNativeUIEvents.bind(this) }
-          onTouchMove={ this._handleCanvasTouchMove.bind(this) }
-          onTouchEnd={ this._handleCanvasTouchEnd.bind(this) }
-        />
+        <div className="canvas-page__canvas-board-container js-canvas-page__canvas-board-container" />
         { toolbox }
         { penTool }
       </div>
