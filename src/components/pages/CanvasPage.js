@@ -12,7 +12,9 @@ import Page from './Page';
 
 
 // TODO:
+// - the "lineCap" can not be applied now
 // - The Eraser button
+// - Apply flux
 // - Apply the Google's Icons to buttons
 // - Make to slide-x tool buttons
 // - Save to own device as the data-uri format
@@ -30,8 +32,10 @@ export default class CanvasPage extends Page {
         type: POINTER_TYPES.PEN,
       },
       toolbox: {
-        isShowing: false,
-        isOnTop: false,
+        isShowing: true,
+        //isShowing: false,
+        isOnTop: true,
+        //isOnTop: false,
         buttons: [
           {
             label: 'P',
@@ -81,6 +85,13 @@ export default class CanvasPage extends Page {
 
   _syncState() {
     this.setState(this._generateState());
+  }
+
+  _syncCanvasBoardConfig() {
+    this._findCanvasBoardNode().emitter.emit('config', {
+      pointerType: this._stateTree.get(['pointer', 'type']),
+      penWidth: this._stateTree.get(['tools', 'pen', 'penWidth']),
+    });
   }
 
   _findCanvasBoardContainerNode() {
@@ -156,6 +167,7 @@ export default class CanvasPage extends Page {
 
   _pointerToolboxButtonAction() {
     this._cyclePointerType();
+    this._syncCanvasBoardConfig();
     this._syncState();
   }
 
@@ -174,17 +186,13 @@ export default class CanvasPage extends Page {
 
   _penToolPlusButtonAction() {
     this._alterPenWidth(2);
-    this._findCanvasBoardNode().emitter.emit('config', {
-      penWidth: this._stateTree.get(['tools', 'pen', 'penWidth']),
-    });
+    this._syncCanvasBoardConfig();
     this._syncState();
   }
 
   _penToolMinusButtonAction() {
     this._alterPenWidth(-2);
-    this._findCanvasBoardNode().emitter.emit('config', {
-      penWidth: this._stateTree.get(['tools', 'pen', 'penWidth']),
-    });
+    this._syncCanvasBoardConfig();
     this._syncState();
   }
 
@@ -202,6 +210,7 @@ export default class CanvasPage extends Page {
         this._findCanvasBoardNode().emitter.emit('clear');
         break;
       case 68:  // "d"
+        this._findCanvasBoardNode().emitter.emit('dump');
         console.log(this);
         break;
       case 82:  // "r"
@@ -233,6 +242,8 @@ export default class CanvasPage extends Page {
       height={ this.props.root.screenSize.height }
     />;
     ReactDOM.render(this._canvasBoard, this._findCanvasBoardContainerNode());
+
+    this._syncCanvasBoardConfig();
   }
 
   componentWillUnmount() {

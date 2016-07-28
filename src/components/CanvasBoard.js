@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import { POINTER_TYPES } from '../consts';
 import EditHistory from '../lib/EditHistory';
 import TouchStartReceiver from '../lib/TouchStartReceiver';
 import { ignoreNativeUIEvents } from '../lib/utils';
@@ -12,7 +13,9 @@ export default class CanvasBoard extends React.Component {
     super(props);
 
     this._config = {
+      eraserWidth: 5,
       penWidth: 1,
+      pointerType: POINTER_TYPES.PEN,
     };
 
     this._canvasContext = null;
@@ -29,7 +32,12 @@ export default class CanvasBoard extends React.Component {
     this._emitter = new EventEmitter();
 
     this._emitter.on('config', (data) => {
+      // TODO: filter by receivable keys
       Object.assign(this._config, data)
+    });
+
+    this._emitter.on('dump', () => {
+      console.log(this);
     });
 
     this._emitter.on('clear', () => {
@@ -57,13 +65,14 @@ export default class CanvasBoard extends React.Component {
     const image = new Image(this.props.width, this.props.height);
 
     return new Promise((resolve) => {
-      image.src = dataUri;
-      // This `onload` should be use at least for the Moblie Safari
-      image.onload = () => {
+      // This `load` should be use at least for the Moblie Safari
+      image.addEventListener('load', () => {
         this._clear();
+        this._canvasContext.globalCompositeOperation = 'source-over';
         this._canvasContext.drawImage(image, 0, 0, this.props.width, this.props.height);
         resolve();
-      }
+      });
+      image.src = dataUri;
     });
   }
 
@@ -123,8 +132,15 @@ export default class CanvasBoard extends React.Component {
     ];
 
     if (beforeMatrix !== null) {
-      // TODO:
-      this._canvasContext.lineWidth = this._config.penWidth;
+      if (this._config.pointerType === POINTER_TYPES.PEN) {
+        this._canvasContext.globalCompositeOperation = 'source-over';
+        this._canvasContext.lineWidth = this._config.penWidth;
+        this._canvasContext.lineCap = 'round';
+      } else {
+        this._canvasContext.globalCompositeOperation = 'destination-out';
+        this._canvasContext.lineWidth = this._config.eraserWidth;
+        this._canvasContext.lineCap = 'square';
+      }
       this._canvasContext.beginPath();
       this._canvasContext.moveTo(beforeMatrix[0], beforeMatrix[1]);
       this._canvasContext.lineTo(currentMatrix[0], currentMatrix[1]);
