@@ -94,6 +94,10 @@ export default class CanvasBoard extends React.Component {
     }
   }
 
+  _emitMultiTouch(isOnTop) {
+    this._emitter.emit('multi_touch', { isOnTop });
+  }
+
   /*
    * It handles the native "touchstart" rather than the React's "onTouchStart",
    *   because the "onTouchStart" does not have `event.changedTouches`.
@@ -115,8 +119,8 @@ export default class CanvasBoard extends React.Component {
 
     const activePointsData = this._touchStartReceiver.getActivePointsData(nowTimestamp);
     if (activePointsData.points.length >= 2) {
-      const isOnTop = activePointsData.centerPoint.y < this.props.root.screenSize.height / 2;
-      this._toggleToolboxAction(isOnTop);
+      const isOnTop = activePointsData.centerPoint.y < this.props.height / 2;
+      this._emitMultiTouch(isOnTop);
     }
   }
 
