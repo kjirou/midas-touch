@@ -12,8 +12,6 @@ import Page from './Page';
 
 
 // TODO:
-// - the "lineCap" can not be applied now
-// - The Eraser button
 // - Apply flux
 // - Apply the Google's Icons to buttons
 // - Make to slide-x tool buttons
@@ -26,6 +24,7 @@ export default class CanvasPage extends Page {
     this._canvasBoard = null;
 
     this._handleBoundNativeWindowKeyDown = this._handleNativeWindowKeyDown.bind(this);
+    this._handleBoundCanvasBoardMultiTouch = this._handleCanvasBoardMultiTouch.bind(this);
 
     this._stateTree = new Baobab({
       pointer: {
@@ -251,6 +250,10 @@ export default class CanvasPage extends Page {
   // DOM Event Handlers
   //
 
+  _handleCanvasBoardMultiTouch({ isOnTop }) {
+    this._toggleToolboxAction(isOnTop);
+  }
+
   _handleNativeWindowKeyDown(event) {
     const shift = event.shiftKey;
     const ctrl = event.ctrlKey || event.metaKey;
@@ -293,11 +296,17 @@ export default class CanvasPage extends Page {
     />;
     ReactDOM.render(this._canvasBoard, this._findCanvasBoardContainerNode());
 
+    const canvasBoardNode = this._findCanvasBoardNode();
+    canvasBoardNode.emitter.on('multi_touch', this._handleBoundCanvasBoardMultiTouch);
+
     this._syncCanvasBoardConfig();
   }
 
   componentWillUnmount() {
     window.removeEventListener('keydown', this._handleBoundNativeWindowKeyDown);
+
+    const canvasBoardNode = this._findCanvasBoardNode();
+    canvasBoardNode.emitter.off('multi_touch', this._handleBoundCanvasBoardMultiTouch);
 
     ReactDOM.unmountComponentAtNode(this._findCanvasBoardContainerNode());
   }
