@@ -40,10 +40,10 @@ export default class CanvasPage extends Page {
         eraserWidth: 5,
       },
       toolbox: {
-        isShowing: true,
-        //isShowing: false,
-        isOnTop: true,
-        //isOnTop: false,
+        //isShowing: true,
+        isShowing: false,
+        //isOnTop: true,
+        isOnTop: false,
         buttons: [
           {
             label: 'P',
