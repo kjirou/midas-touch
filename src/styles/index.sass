@@ -139,7 +139,7 @@ body.is-development
     @if $horizontal-layout == "middle" { transform: translate(-50%, 0) }
     @if $layout-id == "middle-middle" { transform: translate(-50%, -50%) }
 
-  .pen-tool
+  .spinner-tool
     @include tool-base()
     display: flex
     flex-direction: column
@@ -147,13 +147,13 @@ body.is-development
     height: 48px + 24px + 48px
     @include tool-position("bottom", "middle")
 
-    &.pen-tool--is-on-top
+    &.spinner-tool--is-on-top
       @include tool-position("top", "middle")
 
     .plus-button
       @include tool-button-base()
 
-    .pen-width
+    .value
       width: 100%;
       height: 24px
       line-height: 24px

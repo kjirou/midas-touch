@@ -7,7 +7,7 @@ import EventHandlerCarrier from '../../lib/EventHandlerCarrier';
 import { ignoreNativeUIEvents } from '../../lib/utils';
 import CanvasBoard from '../CanvasBoard';
 import Toolbox from '../Toolbox';
-import PenTool from '../tools/PenTool';
+import SpinnerTool from '../tools/SpinnerTool';
 import Page from './Page';
 
 
@@ -30,6 +30,14 @@ export default class CanvasPage extends Page {
     this._stateTree = new Baobab({
       pointer: {
         type: POINTER_TYPES.PEN,
+        /*
+         * @param {number} - A integer >= 1
+         */
+        penWidth: 1,
+        /*
+         * @param {number} - A integer >= 1
+         */
+        eraserWidth: 5,
       },
       toolbox: {
         isShowing: true,
@@ -48,6 +56,11 @@ export default class CanvasPage extends Page {
             action: new EventHandlerCarrier(() => this._penToolboxButtonAction()),
           },
           {
+            label: 'Eraser',
+            classList: [],
+            action: new EventHandlerCarrier(() => this._eraserToolboxButtonAction()),
+          },
+          {
             label: 'Undo',
             classList: [],
             action: new EventHandlerCarrier(() => this._undoToolboxButtonAction()),
@@ -62,14 +75,13 @@ export default class CanvasPage extends Page {
       tools: {
         pen: {
           isShowing: false,
-
-          /*
-           * @param {number} - A integer >= 1
-           */
-          penWidth: 1,
-
           plusAction: new EventHandlerCarrier(() => this._penToolPlusButtonAction()),
           minusAction: new EventHandlerCarrier(() => this._penToolMinusButtonAction()),
+        },
+        eraser: {
+          isShowing: false,
+          plusAction: new EventHandlerCarrier(() => this._eraserToolPlusButtonAction()),
+          minusAction: new EventHandlerCarrier(() => this._eraserToolMinusButtonAction()),
         },
       },
     });
@@ -90,7 +102,8 @@ export default class CanvasPage extends Page {
   _syncCanvasBoardConfig() {
     this._findCanvasBoardNode().emitter.emit('config', {
       pointerType: this._stateTree.get(['pointer', 'type']),
-      penWidth: this._stateTree.get(['tools', 'pen', 'penWidth']),
+      penWidth: this._stateTree.get(['pointer', 'penWidth']),
+      eraserWidth: this._stateTree.get(['pointer', 'eraserWidth']),
     });
   }
 
@@ -143,14 +156,34 @@ export default class CanvasPage extends Page {
     }
   }
 
+  _toggleEraserTool() {
+    const cursor = this._stateTree.select(['tools', 'eraser']);
+
+    if (cursor.get('isShowing')) {
+      cursor.set('isShowing', false);
+    } else {
+      cursor.set('isShowing', true);
+    }
+  }
+
   _setPenWidth(value) {
-    const limitedValue = Math.min(Math.max(value, 1), 15);
-    this._stateTree.set(['tools', 'pen', 'penWidth'], limitedValue);
+    const limitedValue = Math.min(Math.max(value, 1), 25);
+    this._stateTree.set(['pointer', 'penWidth'], limitedValue);
   }
 
   _alterPenWidth(delta) {
-    const nextPenWidth = this._stateTree.get(['tools', 'pen', 'penWidth']) + delta;
+    const nextPenWidth = this._stateTree.get(['pointer', 'penWidth']) + delta;
     this._setPenWidth(nextPenWidth);
+  }
+
+  _setEraserWidth(value) {
+    const limitedValue = Math.min(Math.max(value, 1), 25);
+    this._stateTree.set(['pointer', 'eraserWidth'], limitedValue);
+  }
+
+  _alterEraserWidth(delta) {
+    const nextPenWidth = this._stateTree.get(['pointer', 'eraserWidth']) + delta;
+    this._setEraserWidth(nextPenWidth);
   }
 
 
@@ -176,6 +209,11 @@ export default class CanvasPage extends Page {
     this._syncState();
   }
 
+  _eraserToolboxButtonAction() {
+    this._toggleEraserTool();
+    this._syncState();
+  }
+
   _undoToolboxButtonAction() {
     this._findCanvasBoardNode().emitter.emit('undo');
   }
@@ -192,6 +230,18 @@ export default class CanvasPage extends Page {
 
   _penToolMinusButtonAction() {
     this._alterPenWidth(-2);
+    this._syncCanvasBoardConfig();
+    this._syncState();
+  }
+
+  _eraserToolPlusButtonAction() {
+    this._alterEraserWidth(4);
+    this._syncCanvasBoardConfig();
+    this._syncState();
+  }
+
+  _eraserToolMinusButtonAction() {
+    this._alterEraserWidth(-4);
     this._syncCanvasBoardConfig();
     this._syncState();
   }
@@ -258,19 +308,32 @@ export default class CanvasPage extends Page {
         isOnTop={ state.toolbox.isOnTop }
         buttons={ state.toolbox.buttons }
       />;
-    }
+    };
 
     const createPenTool = (state) => {
-      return <PenTool {
+      return <SpinnerTool {
         ...Object.assign({}, state.tools.pen, {
+          key: 'pen-tool',
           isOnTop: state.toolbox.isOnTop,
+          value: state.pointer.penWidth,
         })
       }/>
-    }
+    };
+
+    const createEraserTool = (state) => {
+      return <SpinnerTool {
+        ...Object.assign({}, state.tools.eraser, {
+          key: 'eraser-tool',
+          isOnTop: state.toolbox.isOnTop,
+          value: state.pointer.eraserWidth,
+        })
+      }/>
+    };
 
 
     const toolbox = this.state.toolbox.isShowing ? createToolbox(this.state) : null;
     const penTool = this.state.tools.pen.isShowing ? createPenTool(this.state) : null;
+    const eraserTool = this.state.tools.eraser.isShowing ? createEraserTool(this.state) : null;
 
     return (
       <div
@@ -281,6 +344,7 @@ export default class CanvasPage extends Page {
         <div className="canvas-page__canvas-board-container js-canvas-page__canvas-board-container" />
         { toolbox }
         { penTool }
+        { eraserTool }
       </div>
     );
   }
