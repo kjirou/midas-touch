@@ -12,8 +12,6 @@ import Page from './Page';
 
 
 // TODO:
-// - the "lineCap" can not be applied now
-// - The Eraser button
 // - Apply flux
 // - Apply the Google's Icons to buttons
 // - Make to slide-x tool buttons
