@@ -8,10 +8,14 @@ export default class Toolbox extends React.Component {
       const className = ['tool-button'].concat(classList).join(' ');
       const handler = action.bindContexts(this);
 
-      return <div
-        key={ `button-${ index }` }
-        className={ className }
-        onTouchStart={ handler }>{ label }</div>;
+      return (
+        <div
+          key={ `button-${ index }` }
+          className={ className }
+          onTouchStart={ handler }>
+          <i className="material-icons">face</i>
+        </div>
+      );
     });
   }
 
