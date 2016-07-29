@@ -14,7 +14,6 @@ import Page from './Page';
 // TODO:
 // - Apply flux
 // - Apply the Google's Icons to buttons
-// - Make to slide-x tool buttons
 // - Save to own device as the data-uri format
 // - Save default width/height at first access
 export default class CanvasPage extends Page {
@@ -68,6 +67,21 @@ export default class CanvasPage extends Page {
             label: 'Redo',
             classList: [],
             action: new EventHandlerCarrier(() => this._redoToolboxButtonAction()),
+          },
+          {
+            label: 'Foo',
+            classList: [],
+            action: new EventHandlerCarrier(() => null),
+          },
+          {
+            label: 'Foo',
+            classList: [],
+            action: new EventHandlerCarrier(() => null),
+          },
+          {
+            label: 'Foo',
+            classList: [],
+            action: new EventHandlerCarrier(() => null),
           },
         ],
       },
