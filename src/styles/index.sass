@@ -29,8 +29,8 @@ body.is-development
 // Fonts
 //
 @font-face
-  font-family: 'Morris Roman'
-  src: url('materials/fonts/morris-roman/MorrisRoman-Black.ttf') format('truetype')
+  font-family: 'Material Icons'
+  src: url('materials/material-design-icons/MaterialIcons-Regular.woff2') format('woff2')
 
 
 //
@@ -64,6 +64,24 @@ body.is-development
       height: 100%
       overflow: hidden
 
+  // From) http://google.github.io/material-design-icons/
+  .material-icons
+    font-family: 'Material Icons'
+    font-weight: normal
+    font-style: normal
+    font-size: 48px;
+    display: inline-block
+    line-height: 1
+    text-transform: none
+    letter-spacing: normal
+    word-wrap: normal
+    white-space: nowrap
+    direction: ltr
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'liga';
+
 
 //
 // Independent Components
@@ -77,29 +95,36 @@ body.is-development
   .toolbox
     position: absolute
     width: 100%
-    height: 64px
+    height: 88px
     bottom: 0
     z-index: $z-index-canvas-page-1
-    background-color: #ff9900
+    overflow: scroll
+    overflow-y: hidden
+    background-color: rgba(64, 64, 64, 0.5)
 
     &.toolbox--is-on-top
       top: 0
+
+      .toolbox__tool-buttons
+        margin-top: 24px
 
     &__tool-buttons
       display: flex
       flex-wrap: wrap
       justify-content: flex-start
       align-items: center
-      width: 100%
-      height: 100%
+      // TODO: I want to enable scroll-x if the total of children's width is over its parent's width
+      width: 250%
+      height: 64px
       overflow: hidden
-      background-color: silver
 
       .tool-button
-        margin: 0 0 0 8px
+        margin-left: 8px
         width: 48px
         height: 48px
-        background-color: yellow
+        border-radius: 4px
+        background-color: #666666
+        color: #ffffff
         cursor: pointer
 
 
@@ -125,7 +150,7 @@ body.is-development
     z-index: $z-index-canvas-page-2
 
   @mixin tool-position($vertical-layout, $horizontal-layout)
-    $vertical-margin: 72px
+    $vertical-margin: 96px
     @if $vertical-layout == "top" { top: $vertical-margin }
     @if $vertical-layout == "middle" { top: 50% }
     @if $vertical-layout == "bottom" { bottom: $vertical-margin }

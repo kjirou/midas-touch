@@ -1,17 +1,37 @@
 import React from 'react';
 
+import EventHandlerCarrier from '../lib/EventHandlerCarrier';
+
+
+class ToolButton extends React.Component {
+  render() {
+    const className = ['tool-button'].concat(this.props.classNames || []).join(' ');
+    const iconOrLabel = this.props.iconId ?
+      <i className="material-icons">{ this.props.iconId }</i> : this.props.label;
+
+    return (
+      <div
+        className={ className }
+        onTouchStart={ this.props.action.bindContexts(this) }
+      >
+        { iconOrLabel }
+      </div>
+    );
+  }
+}
+ToolButton.propTypes = {
+  iconId: React.PropTypes.string,
+  label: React.PropTypes.string,
+  classNames: React.PropTypes.array,
+  action: React.PropTypes.instanceOf(EventHandlerCarrier).isRequired,
+};
+
 
 export default class Toolbox extends React.Component {
 
   _createButtons() {
-    return this.props.buttons.map(({ label, classList, action }, index) => {
-      const className = ['tool-button'].concat(classList).join(' ');
-      const handler = action.bindContexts(this);
-
-      return <div
-        key={ `button-${ index }` }
-        className={ className }
-        onTouchStart={ handler }>{ label }</div>;
+    return this.props.buttons.map((buttonData, index) => {
+      return <ToolButton key={ `button-${ index }` } { ...buttonData } />
     });
   }
 

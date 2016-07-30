@@ -28,6 +28,7 @@ const CSS_SOURCE_PATTERNS = [
 ];
 const STATIC_FILE_PATTERNS = [
   path.join(SOURCE_ROOT, '**/*.ttf'),
+  path.join(SOURCE_ROOT, '**/*.woff2'),
 ];
 const DATA_URI_IMAGE_PATTERNS = [
   path.join(PUBLIC_DIST_ROOT, 'icons/**/*.png'),

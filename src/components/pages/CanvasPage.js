@@ -13,8 +13,6 @@ import Page from './Page';
 
 // TODO:
 // - Apply flux
-// - Apply the Google's Icons to buttons
-// - Make to slide-x tool buttons
 // - Save to own device as the data-uri format
 // - Save default width/height at first access
 export default class CanvasPage extends Page {
@@ -39,10 +37,10 @@ export default class CanvasPage extends Page {
         eraserWidth: 5,
       },
       toolbox: {
-        //isShowing: true,
-        isShowing: false,
-        //isOnTop: true,
+        //isShowing: false,
+        isShowing: true,
         isOnTop: false,
+        //isOnTop: true,
         buttons: [
           {
             label: 'P',
@@ -51,23 +49,35 @@ export default class CanvasPage extends Page {
           },
           {
             label: 'Pen',
-            classList: [],
+            iconId: 'brush',
             action: new EventHandlerCarrier(() => this._penToolboxButtonAction()),
           },
           {
             label: 'Eraser',
-            classList: [],
+            iconId: 'crop_square',
             action: new EventHandlerCarrier(() => this._eraserToolboxButtonAction()),
           },
           {
             label: 'Undo',
-            classList: [],
+            iconId: 'fast_rewind',
             action: new EventHandlerCarrier(() => this._undoToolboxButtonAction()),
           },
           {
             label: 'Redo',
-            classList: [],
+            iconId: 'fast_forward',
             action: new EventHandlerCarrier(() => this._redoToolboxButtonAction()),
+          },
+          {
+            label: 'Foo',
+            action: new EventHandlerCarrier(() => null),
+          },
+          {
+            label: 'Foo',
+            action: new EventHandlerCarrier(() => null),
+          },
+          {
+            label: 'Foo',
+            action: new EventHandlerCarrier(() => null),
           },
         ],
       },
