@@ -13,7 +13,6 @@ import Page from './Page';
 
 // TODO:
 // - Apply flux
-// - Apply the Google's Icons to buttons
 // - Save to own device as the data-uri format
 // - Save default width/height at first access
 export default class CanvasPage extends Page {
