@@ -54,7 +54,7 @@ export default class CanvasPage extends Page {
           },
           {
             label: 'Eraser',
-            iconId: 'crop_square',
+            iconId: 'stop',
             action: new EventHandlerCarrier(() => this._eraserToolboxButtonAction()),
           },
           {
