@@ -43,13 +43,9 @@ export default class CanvasPage extends Page {
         //isOnTop: true,
         buttons: [
           {
-            label: 'P',
-            classList: [],
-            action: new EventHandlerCarrier(() => this._pointerToolboxButtonAction()),
-          },
-          {
             label: 'Pen',
             iconId: 'brush',
+            classNames: ['is-active'],
             action: new EventHandlerCarrier(() => this._penToolboxButtonAction()),
           },
           {
@@ -126,22 +122,26 @@ export default class CanvasPage extends Page {
     return node.querySelector('.js-canvas-board');
   }
 
-  _cyclePointerType() {
+  _changePointerType(pointerType) {
     const pointerCursor = this._stateTree.select('pointer');
 
-    const nextPointerType = {
-      [POINTER_TYPES.PEN]: POINTER_TYPES.ERASER,
-      [POINTER_TYPES.ERASER]: POINTER_TYPES.PEN,
-    }[pointerCursor.get('type')];
+    pointerCursor.set('type', pointerType);
 
-    pointerCursor.set('type', nextPointerType);
-
-    const label = {
-      [POINTER_TYPES.PEN]: 'P',
-      [POINTER_TYPES.ERASER]: 'E',
-    }[nextPointerType];
-
-    this._stateTree.set(['toolbox', 'buttons', '0', 'label'], label);
+    // Generate styles for each tool buttons
+    // TODO: It is recursively in the _stateTree
+    // TODO: Not considered to be reference to another state
+    const toolboxCursor = this._stateTree.select('toolbox');
+    toolboxCursor.get('buttons').forEach((button, index) => {
+      // TODO: The labels are used as like a ID!
+      const classNames = [];
+      if (
+        pointerType === POINTER_TYPES.PEN && button.label === 'Pen' ||
+        pointerType === POINTER_TYPES.ERASER && button.label === 'Eraser'
+      ) {
+        classNames.push('is-active');
+      }
+      toolboxCursor.set(['buttons', String(index), 'classNames'], classNames);
+    });
   }
 
   _toggleToolbox(isOnTop) {
@@ -207,19 +207,17 @@ export default class CanvasPage extends Page {
     this._syncState();
   }
 
-  _pointerToolboxButtonAction() {
-    this._cyclePointerType();
+  _penToolboxButtonAction() {
+    this._changePointerType(POINTER_TYPES.PEN);
+    this._togglePenTool();
     this._syncCanvasBoardConfig();
     this._syncState();
   }
 
-  _penToolboxButtonAction() {
-    this._togglePenTool();
-    this._syncState();
-  }
-
   _eraserToolboxButtonAction() {
+    this._changePointerType(POINTER_TYPES.ERASER);
     this._toggleEraserTool();
+    this._syncCanvasBoardConfig();
     this._syncState();
   }
 
