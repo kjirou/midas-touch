@@ -175,6 +175,12 @@ export default class CanvasPage extends Page {
     }
   }
 
+  _hideTools() {
+    ['pen', 'eraser'].forEach(relativePath => {
+      this._stateTree.set(['tools', relativePath, 'isShowing'], false);
+    });
+  }
+
   _setPenWidth(value) {
     const limitedValue = Math.min(Math.max(value, 1), 25);
     this._stateTree.set(['pointer', 'penWidth'], limitedValue);
@@ -208,15 +214,33 @@ export default class CanvasPage extends Page {
   }
 
   _penToolboxButtonAction() {
-    this._changePointerType(POINTER_TYPES.PEN);
-    this._togglePenTool();
+    const beforePointerType = this._stateTree.get(['pointer', 'type']);
+    const afterPointerType = POINTER_TYPES.PEN;
+
+    this._changePointerType(afterPointerType);
+
+    if (beforePointerType === afterPointerType) {
+      this._togglePenTool();
+    } else {
+      this._hideTools();
+    }
+
     this._syncCanvasBoardConfig();
     this._syncState();
   }
 
   _eraserToolboxButtonAction() {
-    this._changePointerType(POINTER_TYPES.ERASER);
-    this._toggleEraserTool();
+    const beforePointerType = this._stateTree.get(['pointer', 'type']);
+    const afterPointerType = POINTER_TYPES.ERASER;
+
+    this._changePointerType(afterPointerType);
+
+    if (beforePointerType === afterPointerType) {
+      this._toggleEraserTool();
+    } else {
+      this._hideTools();
+    }
+
     this._syncCanvasBoardConfig();
     this._syncState();
   }
