@@ -1,5 +1,7 @@
 'use strict';
 
+require('./environments/build');
+
 const babelify = require('babelify');
 const browserSync = require('browser-sync');
 const browserify = require('browserify');

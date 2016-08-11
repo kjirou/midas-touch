@@ -11,6 +11,7 @@ A freehand drawing based prototyping tool
 git clone git@github.com:kjirou/midas-touch.git
 cd midas-touch
 npm install
+npm run init
 ```
 
 ### Run this application on your browser

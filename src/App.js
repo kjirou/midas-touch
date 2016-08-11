@@ -13,7 +13,7 @@ import AppModel from './models/AppModel';
 export default class App {
   /*
    * @param {object} environments - Receive parameters from the outside of JS
-   *                                ex) Brower APIs, URL, HTTP, Dev Settings ..etc
+   *                                ex) Brower APIs, URL, HTTP, ..etc
    */
   constructor(environments = {}) {
     this._environments = Object.assign({
