@@ -19,14 +19,12 @@ export default class RootProvider extends React.Component {
   }
 
   render() {
-    if (this.state === null) {
-      return <div>Now Loading..</div>;
-    }
+    const state = this.state || this.props.initialState;
 
     return (
       <Root
-        pageId={ this.state.pageId }
-        screenSize={ this.state.screenSize }
+        pageId={ state.pageId }
+        screenSize={ state.screenSize }
       />
     );
   }
@@ -37,7 +35,8 @@ Object.assign(RootProvider, {
     emit: React.PropTypes.func.isRequired,
   },
   propTypes: {
-    stateEventEmitter: React.PropTypes.instanceOf(EventEmitter),
-    uiEventEmitter: React.PropTypes.instanceOf(EventEmitter),
+    initialState: React.PropTypes.object.isRequired,
+    stateEventEmitter: React.PropTypes.instanceOf(EventEmitter).isRequired,
+    uiEventEmitter: React.PropTypes.instanceOf(EventEmitter).isRequired,
   },
 });

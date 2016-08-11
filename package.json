@@ -62,6 +62,8 @@
     "build": "gulp build",
     "d": "npm run develop",
     "develop": "gulp develop",
+    "init": "npm run init:config",
+    "init:config": "if [ ! -e src/config/local.js ]; then cp src/config/local.default.js src/config/local.js; fi",
     "s": "npm run serve",
     "serve": "gulp serve",
     "test": "mocha"

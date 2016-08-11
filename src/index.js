@@ -18,6 +18,5 @@ window.document.addEventListener('DOMContentLoaded', () => {
 
   ReactDOM.render(root, container, () => {
     console.log(`Start the app at ${ new Date() }`);
-    app.runFirstFlux();
   });
 });

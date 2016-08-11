@@ -13,11 +13,10 @@ import AppModel from './models/AppModel';
 export default class App {
   /*
    * @param {object} environments - Receive parameters from the outside of JS
-   *                                ex) Brower APIs, URL, HTTP, Dev Settings ..etc
+   *                                ex) Brower APIs, URL, HTTP, ..etc
    */
   constructor(environments = {}) {
     this._environments = Object.assign({
-      initialPage: PAGE_IDS.CANVAS,
       // {number[]} - [width, height]
       screenSize: [0, 0],
     }, environments);
@@ -35,6 +34,7 @@ export default class App {
 
   createReactElement() {
     return React.createElement(RootProvider, {
+      initialState: this._generateState(),
       stateEventEmitter: this._stateEventEmitter,
       uiEventEmitter: this._uiEventEmitter,
     });
@@ -93,9 +93,5 @@ export default class App {
       };
       this._uiEventEmitter.on(uiEventName, handler);
     });
-  }
-
-  runFirstFlux() {
-    this._uiEventEmitter.emit(UI_EVENT_NAMES.SHOW_FIRST_VIEW);
   }
 }
