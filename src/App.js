@@ -35,6 +35,7 @@ export default class App {
 
   createReactElement() {
     return React.createElement(RootProvider, {
+      initialState: this._generateState(),
       stateEventEmitter: this._stateEventEmitter,
       uiEventEmitter: this._uiEventEmitter,
     });
@@ -93,9 +94,5 @@ export default class App {
       };
       this._uiEventEmitter.on(uiEventName, handler);
     });
-  }
-
-  runFirstFlux() {
-    this._uiEventEmitter.emit(UI_EVENT_NAMES.SHOW_FIRST_VIEW);
   }
 }

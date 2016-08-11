@@ -6,7 +6,7 @@ export default class AppModel extends Model {
   constructor() {
     super();
 
-    this._pageId = PAGE_IDS.CANVAS;
+    this._pageId = PAGE_IDS.WELCOME;
   }
 
   get pageId() { return this._pageId; }
