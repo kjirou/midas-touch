@@ -12,6 +12,7 @@ import Page from './Page';
 
 
 // TODO:
+// - Screen rotation
 // - Apply flux
 // - Save to own device as the data-uri format
 // - Save default width/height at first access
