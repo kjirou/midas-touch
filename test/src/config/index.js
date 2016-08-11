@@ -7,6 +7,6 @@ describe('src/config', () => {
 
   it('should be', () => {
     assert.strictEqual(typeof config, 'object');
-    assert('landingPageId' in config);
+    assert('landingPage' in config);
   });
 });
