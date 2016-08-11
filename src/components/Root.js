@@ -33,6 +33,7 @@ export default class Root extends React.Component {
 
 Object.assign(Root, {
   propTypes: {
+    pageId: React.PropTypes.string.isRequired,
     screenSize: React.PropTypes.object.isRequired,
   },
 });

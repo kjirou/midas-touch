@@ -10,4 +10,5 @@ export default class AppModel extends Model {
   }
 
   get pageId() { return this._pageId; }
+  set pageId(value) { this._pageId = value; }
 }
