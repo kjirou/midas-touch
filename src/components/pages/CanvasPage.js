@@ -66,7 +66,9 @@ export default class CanvasPage extends Page {
           },
           {
             label: 'Foo',
-            action: new EventHandlerCarrier(() => null),
+            action: new EventHandlerCarrier(() => {
+              this.context.publish('FOO_EVENT');
+            }),
           },
           {
             label: 'Bar',
