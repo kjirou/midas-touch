@@ -12,6 +12,7 @@ import Page from './Page';
 
 
 // TODO:
+// - Screen rotation
 // - Apply flux
 // - Save to own device as the data-uri format
 // - Save default width/height at first access
@@ -65,7 +66,9 @@ export default class CanvasPage extends Page {
           },
           {
             label: 'Foo',
-            action: new EventHandlerCarrier(() => null),
+            action: new EventHandlerCarrier(() => {
+              this.context.emit('FOO_EVENT');
+            }),
           },
           {
             label: 'Bar',

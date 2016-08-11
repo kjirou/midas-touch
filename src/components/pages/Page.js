@@ -5,6 +5,9 @@ export default class Page extends React.Component {
 }
 
 Object.assign(Page, {
+  contextTypes: {
+    emit: React.PropTypes.func.isRequired,
+  },
   //defaultProps: {
   //  scene: null,
   //},

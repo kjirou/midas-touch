@@ -1,21 +1,23 @@
-export const DEFAULTS = {
+export const _objectFromKeys = (keys) => {
+  const dict = {};
+  keys.forEach(key => dict[key] = key);
+  return dict;
 };
 
-export const EVENTS = {
-  TOUCH_START: 'TOUCH_START',
-};
 
-export const PARAMETERS = {
-};
+export const PAGE_IDS = _objectFromKeys([
+  'CANVAS',
+  'WELCOME',
+]);
 
-export const PAGE_IDS = {
-  CANVAS: 'CANVAS',
-};
+export const POINTER_TYPES = _objectFromKeys([
+  'ERASER',
+  'PEN',
+]);
 
-export const POINTER_TYPES = {
-  ERASER: 'ERASER',
-  PEN: 'PEN',
-};
+export const STATE_EVENTS = _objectFromKeys([
+  'CHANGE',
+]);
 
 // Should sync to stylesheets
 export const STYLES = {
