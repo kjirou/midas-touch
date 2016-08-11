@@ -1,0 +1,17 @@
+&
+  @mixin page-base()
+    position: absolute
+    width: 100%
+    height: 100%
+    font-size: 15px
+    color: $app-color
+    background-color: $app-background-color
+
+
+  .canvas-page
+    @include page-base()
+
+    .canvas-page__canvas-board-container
+      position: absolute
+      width: 100%
+      height: 100%
