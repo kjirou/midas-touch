@@ -1,0 +1,39 @@
+.toolbox
+  position: absolute
+  width: 100%
+  height: 88px
+  bottom: 0
+  z-index: $z-index-canvas-page-1
+  overflow: scroll
+  overflow-y: hidden
+  background-color: rgba(64, 64, 64, 0.5)
+
+  &.toolbox--is-on-top
+    top: 0
+
+    .toolbox__tool-buttons
+      margin-top: 24px
+
+  &__tool-buttons
+    display: flex
+    justify-content: flex-start
+    align-items: center
+    height: 64px
+    padding-right: 8px
+
+    .tool-button
+      margin-left: 8px
+      min-width: 48px
+      max-width: 48px
+      height: 48px
+      border-radius: 4px
+      background-color: #666666
+      color: #ffffff
+      cursor: pointer
+
+      // TODO: It is not working
+      &:last-child
+        margin-right: 8px
+
+      &.is-active
+        color: #ffa500

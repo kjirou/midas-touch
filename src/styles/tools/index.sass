@@ -1,0 +1,57 @@
+&
+  @mixin tool-button-base()
+    width: 48px
+    height: 48px
+    line-height: 48px
+    font-size: 16px
+    text-align: center
+    color: black
+    background-color: yellow
+    cursor: pointer
+
+  @mixin tool-base()
+    position: absolute;
+    width: 0
+    height: 0
+    z-index: $z-index-canvas-page-2
+
+  @mixin tool-position($vertical-layout, $horizontal-layout)
+    $vertical-margin: 96px
+    @if $vertical-layout == "top" { top: $vertical-margin }
+    @if $vertical-layout == "middle" { top: 50% }
+    @if $vertical-layout == "bottom" { bottom: $vertical-margin }
+
+    @if $horizontal-layout == "left" { left: 0 }
+    @if $horizontal-layout == "middle" { left: 50% }
+    @if $horizontal-layout == "right" { right: 0 }
+
+    $layout-id: $vertical-layout + "-" + $horizontal-layout
+    @if $vertical-layout == "middle" { transform: translate(0, -50%) }
+    @if $horizontal-layout == "middle" { transform: translate(-50%, 0) }
+    @if $layout-id == "middle-middle" { transform: translate(-50%, -50%) }
+
+
+  .spinner-tool
+    @include tool-base()
+    display: flex
+    flex-direction: column
+    width: 48px
+    height: 48px + 24px + 48px
+    @include tool-position("bottom", "middle")
+
+    &.spinner-tool--is-on-top
+      @include tool-position("top", "middle")
+
+    .plus-button
+      @include tool-button-base()
+
+    .value
+      width: 100%;
+      height: 24px
+      line-height: 24px
+      font-size: 16px
+      text-align: center;
+      background-color: silver
+
+    .minus-button
+      @include tool-button-base()
