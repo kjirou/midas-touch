@@ -85,22 +85,6 @@ export default class App {
     ;
   }
 
-  _createUiEventHandlers(routes, logics) {
-    const eventHandlers = {};
-
-    Object.keys(routes).sort().map(eventName => {
-      const { logicName, curriedArgs } = routes[eventName]
-      const logic = logics[logicName];
-
-      const command = new Command();
-      command.commandifyLogic(logic, this._appModel, curriedArgs);
-
-      eventHandlers[eventName] = eventHandler;
-    });
-
-    return eventHandlers;
-  }
-
   _subscribeUiEvents(uiCommands) {
     Object.keys(uiCommands).sort().forEach(uiEventName => {
       const command = uiCommands[uiEventName];
