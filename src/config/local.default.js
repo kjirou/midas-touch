@@ -1,3 +1,3 @@
 export default function localConfig(config) {
-  //config.landingPageId = 'CANVAS';
+  //config.landingPage = 'CANVAS';
 }

@@ -17,7 +17,6 @@ export default class App {
    */
   constructor(environments = {}) {
     this._environments = Object.assign({
-      initialPage: PAGE_IDS.CANVAS,
       // {number[]} - [width, height]
       screenSize: [0, 0],
     }, environments);

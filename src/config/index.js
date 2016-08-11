@@ -2,11 +2,15 @@ const isNode = Boolean(typeof process === 'object' && process.env && process.env
 const isNodeTest = isNode && process.env.MIDAS_TOUCH_NODE_ENV === 'test';
 
 const config = {
-  landingPageId: null,
+  landingPage: null,
 };
 
 const localConfig = require('./local').default;
 localConfig(config);
+
+if (isNodeTest) {
+  config.landingPage = null;
+}
 
 
 export default config;
