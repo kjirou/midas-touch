@@ -25,7 +25,6 @@
 /.tox/
 /bower_components/
 /develop-eggs/
-/dist/
 /eggs/
 /node_modules/
 /sdist/
