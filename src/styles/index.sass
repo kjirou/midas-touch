@@ -110,22 +110,24 @@ body.is-development
 
     &__tool-buttons
       display: flex
-      flex-wrap: wrap
       justify-content: flex-start
       align-items: center
-      // TODO: I want to enable scroll-x if the total of children's width is over its parent's width
-      width: 250%
       height: 64px
-      overflow: hidden
+      padding-right: 8px
 
       .tool-button
         margin-left: 8px
-        width: 48px
+        min-width: 48px
+        max-width: 48px
         height: 48px
         border-radius: 4px
         background-color: #666666
         color: #ffffff
         cursor: pointer
+
+        // TODO: It is not working
+        &:last-child
+          margin-right: 8px
 
         &.is-active
           color: #ffa500

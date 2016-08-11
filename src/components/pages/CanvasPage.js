@@ -68,11 +68,15 @@ export default class CanvasPage extends Page {
             action: new EventHandlerCarrier(() => null),
           },
           {
-            label: 'Foo',
+            label: 'Bar',
             action: new EventHandlerCarrier(() => null),
           },
           {
-            label: 'Foo',
+            label: 'Baz',
+            action: new EventHandlerCarrier(() => null),
+          },
+          {
+            label: 'Qux',
             action: new EventHandlerCarrier(() => null),
           },
         ],
