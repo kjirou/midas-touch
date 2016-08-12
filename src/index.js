@@ -9,6 +9,7 @@ import { PAGE_IDS } from './consts';
 // - Test
 //   - Run on the CI
 //   - App.js tests
+// - Locking UI
 // - Screen rotation
 // - Save to own device as the data-uri format
 // - Save default width/height at first access
