@@ -7,7 +7,7 @@ import routes, { UI_EVENT_NAMES } from './domain/routes';
 import Command from './lib/Command';
 import StateEventEmitter from './lib/event-emitters/StateEventEmitter';
 import UiEventEmitter from './lib/event-emitters/UiEventEmitter';
-import AppModel from './models/AppModel';
+import AppModel from './domain/models/AppModel';
 
 
 export default class App {

@@ -1,7 +1,7 @@
 import assert from 'power-assert';
 
+import AppModel from 'src/domain/models/AppModel';
 import Command from 'src/lib/Command';
-import AppModel from 'src/models/AppModel';
 
 
 describe('src/domain/Command', () => {
