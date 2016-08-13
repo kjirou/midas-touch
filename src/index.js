@@ -5,6 +5,11 @@ import App from './App';
 import { PAGE_IDS } from './consts';
 
 
+// TODO:
+// - Locking UI
+// - Screen rotation
+// - Save to own device as the data-uri format
+// - Save default width/height at first access
 window.document.addEventListener('DOMContentLoaded', () => {
   //console.log('standalone:', window.navigator.standalone);
   const viewportSize = getViewportSize();

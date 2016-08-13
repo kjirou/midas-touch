@@ -1,21 +1,17 @@
-export const _objectFromKeys = (keys) => {
-  const dict = {};
-  keys.forEach(key => dict[key] = key);
-  return dict;
-};
+import { objectFromKeys } from '@kjirou/utils';
 
 
-export const PAGE_IDS = _objectFromKeys([
+export const PAGE_IDS = objectFromKeys([
   'CANVAS',
   'WELCOME',
 ]);
 
-export const POINTER_TYPES = _objectFromKeys([
+export const POINTER_TYPES = objectFromKeys([
   'ERASER',
   'PEN',
 ]);
 
-export const STATE_EVENTS = _objectFromKeys([
+export const STATE_EVENTS = objectFromKeys([
   'CHANGE',
 ]);
 

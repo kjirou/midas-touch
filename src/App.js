@@ -27,7 +27,7 @@ export default class App {
 
     this._uiEventEmitter = new UiEventEmitter();
 
-    this._uiCommands = this._createUiCommands(routes, logics, this._appModel);
+    this._uiCommands = this._createUiCommands(logics, routes, this._appModel);
 
     this._subscribeUiEvents(this._uiCommands);
   }
@@ -40,7 +40,7 @@ export default class App {
     });
   }
 
-  _createUiCommands(routes, logics, appModel) {
+  _createUiCommands(logics, routes, appModel) {
     const commands = {};
 
     Object.keys(routes).sort().map(uiEventName => {
