@@ -6,6 +6,7 @@ import { PAGE_IDS } from './consts';
 
 
 // TODO:
+// - Fluxify the CanvasPage logics
 // - Locking UI
 // - Screen rotation
 // - Save to own device as the data-uri format

@@ -1,7 +1,7 @@
 import assert from 'power-assert';
 
 import App from 'src/App';
-import Command from 'src/domain/Command';
+import Command from 'src/lib/Command';
 import AppModel from 'src/models/AppModel';
 
 
