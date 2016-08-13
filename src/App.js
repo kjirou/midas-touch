@@ -2,9 +2,9 @@ import React from 'react';
 
 import RootProvider from './components/RootProvider';
 import { PAGE_IDS, STATE_EVENTS } from './consts';
-import Command from './domain/Command';
 import logics from './domain/logics';
 import routes, { UI_EVENT_NAMES } from './domain/routes';
+import Command from './lib/Command';
 import StateEventEmitter from './lib/event-emitters/StateEventEmitter';
 import UiEventEmitter from './lib/event-emitters/UiEventEmitter';
 import AppModel from './models/AppModel';
