@@ -29,7 +29,7 @@ describe('src/App', () => {
 
       const appModel = new AppModel();
 
-      const commands = App.prototype._createUiCommands(routes, logics, appModel);
+      const commands = App.prototype._createUiCommands(logics, routes, appModel);
 
       assert.strictEqual(Object.keys(commands).length, 3);
 
