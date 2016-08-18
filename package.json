@@ -26,6 +26,7 @@
     "gulp-concat": "2.6.0",
     "gulp-rename": "1.2.2",
     "gulp-sass": "2.3.1",
+    "http-server": "0.9.0",
     "licensify": "3.1.0",
     "mocha": "2.4.5",
     "mocha-automatic-coffeemaker": "0.2.0",
@@ -64,8 +65,13 @@
     "develop": "gulp develop",
     "init": "npm run init:config",
     "init:config": "if [ ! -e src/config/local.js ]; then cp src/config/local.default.js src/config/local.js; fi",
+    "open": "npm run open:app",
+    "open:app": "open http://localhost:3000",
+    "open:docs": "open http://localhost:8080",
     "s": "npm run serve",
-    "serve": "gulp serve",
+    "serve": "npm run serve:app",
+    "serve:app": "gulp serve",
+    "serve:docs": "http-server docs",
     "test": "mocha"
   }
 }
