@@ -18,3 +18,10 @@ export const STATE_EVENTS = objectFromKeys([
 // Should sync to stylesheets
 export const STYLES = {
 };
+
+export const TOOL_IDS = objectFromKeys([
+  'ERASER',
+  'PEN',
+  'REDO',
+  'UNDO',
+]);

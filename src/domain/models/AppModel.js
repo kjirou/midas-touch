@@ -1,5 +1,5 @@
-import config from '../config';
-import { PAGE_IDS } from '../consts';
+import config from '../../config';
+import { PAGE_IDS } from '../../consts';
 import Model from './Model';
 
 
